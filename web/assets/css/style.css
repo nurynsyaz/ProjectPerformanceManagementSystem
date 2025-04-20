@@ -1,0 +1,375 @@
+/*
+Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
+Click nbfs://nbhost/SystemFileSystem/Templates/JSP_Servlet/CascadeStyleSheet.css to edit this template
+*/
+/* 
+    Created on : 3 Mar 2025, 1:09:30 pm
+    Author     : nurin
+*/
+
+/* Ensure the body and html take up the full height of the viewport */
+html, body {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+}
+
+/* Flexbox layout for the body */
+body {
+    display: flex;
+    flex-direction: column;
+    background: url("../img/PPMSbackgroundimage.png") no-repeat center center;
+    background-size: cover;
+    background-attachment: fixed;
+}
+
+/* Main content area should grow to fill available space */
+.main {
+    flex-grow: 1;
+    margin-left: 250px;
+    padding: 40px;
+    padding-top: 80px; /* ✅ Updated */
+    width: calc(100% - 250px);
+}
+
+
+/* Main content area should grow to fill available space */
+.container.flex-grow-1 {
+    flex-grow: 1;
+}
+
+/* Custom Navbar */
+.custom-navbar {
+    background-color: #222; /* Set the background color to #222 */
+    transition: background-color 0.3s ease;
+}
+
+.custom-navbar:hover {
+    background-color: #333 !important; /* Optional: Change hover color */
+}
+
+/* Ensure text and icons are visible on the dark background */
+.custom-navbar .navbar-brand,
+.custom-navbar .nav-link {
+    color: white !important; /* Set text color to white */
+}
+
+.custom-navbar .navbar-toggler-icon {
+    filter: invert(1); /* Invert the color of the toggler icon for better visibility */
+}
+
+/* Style the PPMS logo with a white circular background */
+.navbar-brand img {
+    background-color: white;
+    border-radius: 50%;
+    padding: 5px; /* Adds space inside the circle */
+    box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.2); /* Optional: Adds a slight shadow for effect */
+}
+
+/* Centered Title & Login Button */
+.title-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    text-align: center;
+    flex-direction: column;
+    color: black;
+}
+
+.title-content {
+    background: rgba(255, 255, 255, 0.8);
+    padding: 2em;
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    max-width: 800px;
+    width: 90%;
+}
+
+.title-content .description {
+    font-size: 1.2rem;
+    margin-top: 10px;
+    color: #333;
+}
+
+/* Login Button Styling */
+.login-btn {
+    margin-top: 20px;
+    font-size: 1.2rem;
+    padding: 10px 25px;
+    border-radius: 8px;
+    background-color: #007bff;
+    border: none;
+    color: white;
+    text-decoration: none;
+    transition: background-color 0.3s;
+}
+
+.login-btn:hover {
+    background-color: #0056b3;
+}
+
+/* About Us and Contact Us */
+.about-us, .contact-us {
+    background-color: #f4f4f4;
+    padding: 2em;
+    margin: 1em auto;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    width: 90%;
+    max-width: 800px; 
+    text-align: center;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+}
+
+
+/* Contact Us Boxes */
+.contact-us {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 1em;
+}
+
+.contact-us .box {
+    background-color: #ffffff;
+    border: 1px solid #cccccc;
+    border-radius: 8px;
+    padding: 1.5em;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    margin: 1em;
+    width: 350px;
+    max-width: 400px;
+    text-align: center;
+}
+
+.contact-us .box.follow-us {
+    width: 100%;
+    max-width: 400px;
+}
+
+@media (max-width: 768px) {
+    .title-container {
+        height: auto;
+        padding: 20px;
+    }
+
+    .contact-us {
+        flex-direction: column;
+    }
+
+    .contact-us .box {
+        width: 100%;
+        max-width: 400px;
+    }
+}
+
+/* Vertical Divider */
+.vertical-divider {
+    width: 2px;
+    height: 100%;
+    background-color: #ccc;
+}
+
+/* Sidebar Navigation */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+/* Sidebar Navigation */
+.container-sidebar {
+    position: fixed;
+    top: 90px; /* Adjust this based on your header height */
+    left: 0;
+    width: 250px;
+    height: calc(100vh - 90px); /* Full height minus the header height */
+    background-color: #222;
+    overflow-y: auto; /* Allow scrolling if content overflows */
+    z-index: 1000; /* Ensure it stays above other content */
+}
+
+/* Main content area */
+.main-content {
+    margin-left: 250px; /* Adjust based on sidebar width */
+    padding: 20px;
+    padding-top: 90px; /* Adjust based on header height */
+    min-height: 100vh; /* Ensure the main content takes up the full height */
+}
+
+.container-sidebar:hover {
+    width: 250px;
+}
+
+.container-sidebar .sidebar {
+    width: 100%;
+    height: 100%;
+    padding: 20px 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.container-sidebar .sidebar ul {
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+}
+
+.container-sidebar .sidebar li {
+    width: 100%;
+    padding: 15px 0;
+    text-align: center;
+    border-bottom: 2px solid #333;
+    border-radius: .5rem;
+    cursor: pointer;
+
+}
+
+.container-sidebar .sidebar li:hover {
+    background-color: #6c757d;
+}
+
+.container-sidebar .sidebar .nav-link {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    text-decoration: none;
+    color: white;
+}
+
+.item-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+}
+
+.item-txt {
+    visibility: visible;
+    opacity: 1;
+    text-align: left;
+    flex-grow: 1;
+}
+
+/* Welcome Container */
+.welcome-container {
+    background-color: white; /* White background */
+    padding: 2rem; /* Add padding */
+    border-radius: 10px; /* Rounded corners */
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+    margin: 20px auto; /* Center the container and add margin */
+    max-width: 800px; /* Limit the width */
+    text-align: center; /* Center the text */
+}
+.table-container {
+    width: 100%;
+    overflow-x: auto; /* Allows horizontal scrolling if needed */
+    margin-top: 20px; /* Adds spacing above the table */
+}
+
+.table {
+    width: 100%;
+    table-layout: fixed; /* Ensures columns adjust properly */
+    word-wrap: break-word; /* Prevents text from overflowing */
+    border-collapse: collapse; /* Ensures borders are consistent */
+}
+
+.table th, .table td {
+    text-align: center; /* Centers text for better readability */
+    vertical-align: middle; /* Aligns content in the middle */
+    padding: 12px; /* Adds padding for better spacing */
+}
+
+.table thead th {
+    background-color: #222; /* Dark background for header */
+    color: white; /* White text for header */
+}
+
+.table tbody tr:nth-child(odd) {
+    background-color: #f8f9fa; /* Alternate row color */
+}
+
+.table tbody tr:hover {
+    background-color: #e9ecef; /* Hover effect for rows */
+}
+.card {
+    border: 1px solid #ddd; /* Adds a border */
+    border-radius: 8px; /* Rounded corners */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Adds a subtle shadow */
+    margin-top: 20px; /* Adds spacing above the card */
+}
+
+.card .container.text-center {
+    padding: 20px; /* Adds padding inside the card */
+}
+.chart-container {
+    width: 100% !important;
+    max-width: 500px;
+    margin: 0 auto;
+    padding: 10px;
+}
+/* Assigned User Modal Table Fix */
+.modal .table {
+    table-layout: auto !important;
+    word-break: break-word;
+    white-space: normal;
+}
+
+.modal .table th,
+.modal .table td {
+    padding: 10px 15px;
+    vertical-align: middle;
+    text-align: center;
+    white-space: nowrap;
+    font-size: 0.95rem;
+}
+
+/* Responsive improvement */
+.modal .table-responsive {
+    max-height: 400px;
+    overflow-y: auto;
+}
+.modal .table th:nth-child(2),
+.modal .table td:nth-child(2) {
+    min-width: 120px;
+}
+.modal .table th:nth-child(3),
+.modal .table td:nth-child(3) {
+    min-width: 200px;
+}
+/* Fix long content overflow in modal table */
+.modal .table-responsive {
+    overflow-x: auto;
+    max-width: 100%;
+}
+
+.modal .table td span {
+    display: inline-block;
+    max-width: 300px; /* You can adjust this */
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+
+
+/* Footer Styles */
+footer {
+    background: #666666;
+    padding: 0.5em 0;
+    text-align: center;
+    color: white;
+    height: 50px; /* Set a fixed height */
+    margin-top: auto; /* Push footer to the bottom */
+}
