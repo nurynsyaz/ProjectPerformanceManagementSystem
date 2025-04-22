@@ -15,9 +15,14 @@ import java.sql.Date;
 
 @WebServlet("/EditProjectServlet")
 public class EditProjectServlet extends HttpServlet {
-
-    // ✅ Update method
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        HttpSession session = request.getSession();
+        Integer roleID = (Integer) session.getAttribute("roleID");
+        if (roleID == null || roleID != 1) {
+            response.sendRedirect("unauthorized.jsp");
+            return;
+        }
+
         int projectID = Integer.parseInt(request.getParameter("projectID"));
         String projectName = request.getParameter("projectName");
         String projectDetails = request.getParameter("projectDetails");
@@ -38,7 +43,7 @@ public class EditProjectServlet extends HttpServlet {
                 projectDetails,
                 existingProject.getUserID(),
                 existingProject.getRoleID(),
-                existingProject.getUsername(), // ✅ preserve creator username
+                existingProject.getUsername(),
                 startDate,
                 endDate
         );
@@ -54,8 +59,14 @@ public class EditProjectServlet extends HttpServlet {
         }
     }
 
-    // No change needed here
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        HttpSession session = request.getSession();
+        Integer roleID = (Integer) session.getAttribute("roleID");
+        if (roleID == null || roleID != 1) {
+            response.sendRedirect("unauthorized.jsp");
+            return;
+        }
+
         int projectID = Integer.parseInt(request.getParameter("projectID"));
         ProjectDAO dao = new ProjectDAO();
         Project project = dao.getProjectById(projectID);

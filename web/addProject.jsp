@@ -9,6 +9,14 @@
     out.println("Session UserID: " + session.getAttribute("userID"));
     out.println("Session RoleID: " + session.getAttribute("roleID"));
 %>
+<%
+    Integer roleID = (Integer) session.getAttribute("roleID");
+    if (roleID == null || roleID != 1) {
+        response.sendRedirect("unauthorized.jsp");
+        return;
+    }
+%>
+
 
 <!DOCTYPE html>
 <html lang="en">

@@ -21,6 +21,13 @@ public class addTaskServlet extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
+        HttpSession session = request.getSession();
+        Integer roleID = (Integer) session.getAttribute("roleID");
+        if (roleID == null || roleID != 2) {
+            response.sendRedirect("unauthorized.jsp");
+            return;
+        }
+
         int projectID = Integer.parseInt(request.getParameter("projectID"));
         String taskName = request.getParameter("taskName");
         String taskDetails = request.getParameter("taskDetails");

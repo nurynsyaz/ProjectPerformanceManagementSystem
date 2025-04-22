@@ -212,4 +212,20 @@ public class TaskDAO {
         return assignments;
     }
 
+    public boolean updateTaskStatus(int taskID, int statusID) {
+        String sql = "UPDATE tasks SET statusID = ? WHERE taskID = ?";
+
+        try ( Connection conn = DBConnection.getConnection();  PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setInt(1, statusID);
+            stmt.setInt(2, taskID);
+
+            return stmt.executeUpdate() > 0;
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
 }

@@ -13,9 +13,10 @@ public class User {
     private String password;
     private String salt;
     private int roleID;
+    private String passwordHint;
 
-    // Full constructor
-    public User(int userID, String username, String email, String phoneNumber, String password, String salt, int roleID) {
+    // Full constructor with password hint
+    public User(int userID, String username, String email, String phoneNumber, String password, String salt, int roleID, String passwordHint) {
         this.userID = userID;
         this.username = username;
         this.email = email;
@@ -23,9 +24,15 @@ public class User {
         this.password = password;
         this.salt = salt;
         this.roleID = roleID;
+        this.passwordHint = passwordHint;
     }
 
-    // Minimal constructor
+    // Old constructor without passwordHint for backward compatibility (optional)
+    public User(int userID, String username, String email, String phoneNumber, String password, String salt, int roleID) {
+        this(userID, username, email, phoneNumber, password, salt, roleID, null);
+    }
+
+    // Empty constructor
     public User() {
     }
 
@@ -84,5 +91,13 @@ public class User {
 
     public void setRoleID(int roleID) {
         this.roleID = roleID;
+    }
+
+    public String getPasswordHint() {
+        return passwordHint;
+    }
+
+    public void setPasswordHint(String passwordHint) {
+        this.passwordHint = passwordHint;
     }
 }

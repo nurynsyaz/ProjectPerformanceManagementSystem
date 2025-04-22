@@ -18,9 +18,16 @@ public class DeleteTaskServlet extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
+        HttpSession session = request.getSession();
+        Integer roleID = (Integer) session.getAttribute("roleID");
+        if (roleID == null || roleID != 2) {
+            response.sendRedirect("unauthorized.jsp");
+            return;
+        }
+
         try {
             int taskID = Integer.parseInt(request.getParameter("taskID"));
-            int projectID = Integer.parseInt(request.getParameter("projectID")); // send projectID for redirect
+            int projectID = Integer.parseInt(request.getParameter("projectID"));
 
             TaskDAO dao = new TaskDAO();
             boolean deleted = dao.deleteTask(taskID);

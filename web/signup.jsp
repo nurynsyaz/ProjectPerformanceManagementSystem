@@ -74,6 +74,12 @@
                                         </small>
                                     </div>
                                     <div class="mb-3">
+                                        <label for="passwordHint" class="form-label">Password Hint</label>
+                                        <input type="text" class="form-control" id="passwordHint" name="passwordHint" value="${param.passwordHint}" placeholder="Enter a hint to remember your password" required>
+                                        <small class="text-muted">This hint will be used if you forget your password.</small>
+                                    </div>
+
+                                    <div class="mb-3">
                                         <label class="form-label d-block">Select Role</label>
                                         <div class="form-check">
                                             <input class="form-check-input" type="radio" id="role1" name="role" value="1" ${param.role == '1' ? 'checked' : ''} required>
@@ -94,15 +100,14 @@
                                         <small id="roleError" class="text-muted">Select your role in the system.</small>
                                     </div>
                                 </div>
-                            </div>
 
-                            <hr class="text-secondary">
+                                <hr class="text-secondary">
 
-                            <button type="submit" class="btn btn-primary w-100">Register</button>
-                            <button type="button" class="btn btn-danger w-100 mt-2" onclick="window.location.href = 'index.jsp'">Cancel</button>
-                            <div class="text-center mt-3">
-                                Already have an account? <a href="login.jsp">Login Here</a>
-                            </div>
+                                <button type="submit" class="btn btn-primary w-100">Register</button>
+                                <button type="button" class="btn btn-danger w-100 mt-2" onclick="window.location.href = 'index.jsp'">Cancel</button>
+                                <div class="text-center mt-3">
+                                    Already have an account? <a href="login.jsp">Login Here</a>
+                                </div>
                         </form>
                     </div>
                 </div>

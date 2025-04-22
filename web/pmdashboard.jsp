@@ -62,8 +62,11 @@
             </div>
                 <div class="row justify-content-center">
                     <div class="col-md-6">
-                        <jsp:include page="projectChartUser.jsp" />
+                        <jsp:include page="assignedProjectsChart.jsp" />
                     </div>
+                    <div class="col-md-6">
+                            <jsp:include page="projectProgressChart.jsp" />
+                        </div>
                 </div>
         </main>
 

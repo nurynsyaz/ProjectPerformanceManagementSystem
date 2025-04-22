@@ -11,7 +11,7 @@
 
 <%
     Integer userID = null;
-    int userProjectCount = 0;
+    int createdProjectCount = 0;
 
     if (session != null) {
         userID = (Integer) session.getAttribute("userID");
@@ -19,33 +19,37 @@
 
     if (userID != null) {
         ProjectDAO dao = new ProjectDAO();
-        List<Project> userProjects = dao.getProjectsByUser(userID);
-        userProjectCount = userProjects.size();
+        List<Project> allProjects = dao.getProjectsByUser(userID);
+        for (Project p : allProjects) {
+            if (p.getRoleID() == 1) {
+                createdProjectCount++;
+            }
+        }
     }
 %>
 
 <div class="chart-card-wide">
-    <h4 class="text-center">Your Projects</h4>
+    <h4 class="text-center">Your Created Projects</h4>
 
     <% if (userID == null) { %>
         <p class="text-danger text-center">⚠️ Please log in to view your chart.</p>
     <% } else { %>
         <canvas id="userProjectChart"></canvas>
 
+        <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
         <script>
-            const userCenterText = {
-                id: 'userCenterText',
+            const userCenterPlugin = {
+                id: 'userCenterPlugin',
                 beforeDraw(chart) {
                     const { width, height, ctx } = chart;
+                    const total = chart.config.data.datasets[0].data[0];
                     ctx.restore();
                     ctx.font = "bold 32px sans-serif";
                     ctx.textBaseline = 'middle';
                     ctx.fillStyle = '#000';
-
-                    const text = '<%= userProjectCount %>';
+                    const text = total.toString();
                     const textX = (width - ctx.measureText(text).width) / 2;
                     const textY = height / 2;
-
                     ctx.fillText(text, textX, textY);
                     ctx.save();
                 }
@@ -55,10 +59,10 @@
             new Chart(ctxUser, {
                 type: 'doughnut',
                 data: {
-                    labels: ['My Projects'],
+                    labels: ['Created Projects'],
                     datasets: [{
                         label: 'Project Count',
-                        data: [<%= userProjectCount %>, 100 - <%= userProjectCount %>],
+                        data: [<%= createdProjectCount %>, 100 - <%= createdProjectCount %>],
                         backgroundColor: ['rgba(75, 192, 192, 0.7)', '#e9ecef'],
                         borderWidth: 1
                     }]
@@ -66,10 +70,17 @@
                 options: {
                     cutout: '70%',
                     plugins: {
-                        legend: { display: false }
+                        legend: { display: false },
+                        tooltip: {
+                            callbacks: {
+                                label: function (context) {
+                                    return context.label + ": " + context.parsed + " projects";
+                                }
+                            }
+                        }
                     }
                 },
-                plugins: [userCenterText]
+                plugins: [userCenterPlugin]
             });
         </script>
     <% } %>
@@ -91,7 +102,7 @@
     }
 
     .chart-card-wide canvas {
-        width: 250px !important;  /* Fixed canvas size for consistency */
+        width: 250px !important;
         height: 250px !important;
     }
 </style>

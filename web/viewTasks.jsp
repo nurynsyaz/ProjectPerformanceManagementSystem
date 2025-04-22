@@ -288,8 +288,19 @@
                                                                         <div class="mb-3">
                                                                             <label class="form-label">Upload File</label>
                                                                             <input type="file" name="progressFile" class="form-control" accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.zip" required>
-                                                                            <small class="text-muted">Allowed: PDF, Word, Excel, PPT, ZIP (max 10MB)</small>
+                                                                            <small class="text-muted">Allowed: PDF, Word, Excel, PPT, ZIP (max 1GB)</small>
                                                                         </div>
+                                                                        <div class="mb-3">
+                                                                            <label class="form-label">Update Task Status</label>
+                                                                            <select name="statusID" class="form-select" required>
+                                                                                <option value="">-- Select Status --</option>
+                                                                                <option value="1">In Progress</option>
+                                                                                <option value="2">On-Time</option>
+                                                                                <option value="3">Delayed</option>
+                                                                                <option value="4">Not Started</option>
+                                                                            </select>
+                                                                        </div>
+
                                                                     </div>
                                                                     <div class="modal-footer">
                                                                         <button type="button" class="btn btn-success" onclick="submitUploadForm(<%= task.getTaskID()%>)">Upload</button>
@@ -360,40 +371,57 @@
                                                                                     </td>
                                                                                 </tr>
 
-                                                                                <!-- Edit Progress Modal -->
-                                                                            <div class="modal fade" id="editProgressModal<%= p.getProgressID()%>" tabindex="-1">
-                                                                                <div class="modal-dialog modal-xl">
-                                                                                    <form id="editProgressForm<%= p.getProgressID()%>" enctype="multipart/form-data" onsubmit="return false;">
-                                                                                        <input type="hidden" name="progressID" value="<%= p.getProgressID()%>">
-                                                                                        <input type="hidden" name="taskID" value="<%= task.getTaskID()%>">
-                                                                                        <div class="modal-content">
-                                                                                            <div class="modal-header">
-                                                                                                <h5 class="modal-title">Edit Uploaded Progress</h5>
-                                                                                                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                                                                                            </div>
-                                                                                            <div class="modal-body">
-                                                                                                <div class="mb-3">
-                                                                                                    <label class="form-label">Progress Notes</label>
-                                                                                                    <textarea name="progressNotes" class="form-control" rows="4"><%= p.getNotes() != null ? p.getNotes() : ""%></textarea>
-                                                                                                </div>
-                                                                                                <div class="mb-3">
-                                                                                                    <label class="form-label">Replace File (optional)</label>
-                                                                                                    <input type="file" name="progressFile" class="form-control" accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.zip">
-                                                                                                    <small class="text-muted">Leave empty to keep existing file</small>
-                                                                                                </div>
-                                                                                            </div>
-                                                                                            <div class="modal-footer">
-                                                                                                <button type="button" class="btn btn-success" onclick="submitEditProgress(<%= p.getProgressID()%>)">Save Changes</button>
-                                                                                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                                                                                            </div>
-                                                                                        </div>
-                                                                                    </form>
-                                                                                </div>
-                                                                            </div>
-                                                                            <% } %>
+
+
+                                                                                <% } %>
                                                                             </tbody>
                                                                         </table>
                                                                     </div>
+                                                                    <% for (model.TaskProgress p : progressList) {
+                                                                            if (p.getUserID() == userID) {%>
+                                                                    <!-- Edit Progress Modal -->
+                                                                    <div class="modal fade" id="editProgressModal<%= p.getProgressID()%>" tabindex="-1">
+                                                                        <div class="modal-dialog modal-xl">
+                                                                            <form id="editProgressForm<%= p.getProgressID()%>" enctype="multipart/form-data" onsubmit="return false;">
+                                                                                <input type="hidden" name="progressID" value="<%= p.getProgressID()%>">
+                                                                                <input type="hidden" name="taskID" value="<%= p.getTaskID()%>"> <!-- fixed! -->
+                                                                                <div class="modal-content">
+                                                                                    <div class="modal-header">
+                                                                                        <h5 class="modal-title">Edit Uploaded Progress</h5>
+                                                                                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                                                                    </div>
+                                                                                    <div class="modal-body">
+                                                                                        <div class="mb-3">
+                                                                                            <label class="form-label">Progress Notes</label>
+                                                                                            <textarea name="progressNotes" class="form-control" rows="4"><%= p.getNotes() != null ? p.getNotes() : ""%></textarea>
+                                                                                        </div>
+                                                                                        <div class="mb-3">
+                                                                                            <label class="form-label">Replace File (optional)</label>
+                                                                                            <input type="file" name="progressFile" class="form-control" accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.zip">
+                                                                                            <small class="text-muted">Leave empty to keep existing file</small>
+                                                                                        </div>
+                                                                                        <div class="mb-3">
+                                                                                            <label class="form-label">Update Task Status</label>
+                                                                                            <select name="statusID" class="form-select" required>
+                                                                                                <option value="">-- Select Status --</option>
+                                                                                                <option value="1">In Progress</option>
+                                                                                                <option value="2">On-Time</option>
+                                                                                                <option value="3">Delayed</option>
+                                                                                                <option value="4">Not Started</option>
+                                                                                            </select>
+                                                                                        </div>
+                                                                                    </div>
+                                                                                    <div class="modal-footer">
+                                                                                        <button type="button" class="btn btn-success" onclick="submitEditProgress(<%= p.getProgressID()%>)">Save Changes</button>
+                                                                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                                                                    </div>
+                                                                                </div>
+                                                                            </form>
+                                                                        </div>
+                                                                    </div>
+                                                                    <% }
+                                                                        } %>
+
 
                                                                     <% } else { %>
                                                                     <p class="text-muted text-center">No progress files uploaded yet for this task.</p>
@@ -484,222 +512,6 @@
                                                             </form>
                                                         </div>
                                                     </div>
-
-
-
-                                                    <script>
-                                                        document.addEventListener("DOMContentLoaded", function () {
-                                                            // Load comments when modal is opened
-                                                            const commentsModals = document.querySelectorAll("[id^='viewCommentsModal']");
-                                                            commentsModals.forEach(modal => {
-                                                                const taskID = modal.id.replace("viewCommentsModal", "");
-                                                                modal.addEventListener("show.bs.modal", function () {
-                                                                    const container = document.getElementById("commentsContainer" + taskID);
-                                                                    fetch("ViewCommentsServlet?taskID=" + taskID)
-                                                                            .then(response => response.text())
-                                                                            .then(html => container.innerHTML = html)
-                                                                            .catch(() => container.innerHTML = "<p class='text-danger'>Failed to load comments.</p>");
-                                                                });
-                                                            });
-
-                                                            // Handle Delete Progress Button Clicks
-                                                            const removeButtons = document.querySelectorAll(".btn-remove-progress");
-                                                            removeButtons.forEach(button => {
-                                                                button.addEventListener("click", function () {
-                                                                    const fileName = this.getAttribute("data-file-name");
-
-                                                                    if (!fileName) {
-                                                                        alert("❌ No file name found.");
-                                                                        return;
-                                                                    }
-
-                                                                    if (!confirm("Are you sure you want to delete this progress file?")) {
-                                                                        return;
-                                                                    }
-
-                                                                    fetch("DeleteProgressServlet", {
-                                                                        method: "POST",
-                                                                        headers: {
-                                                                            "Content-Type": "application/x-www-form-urlencoded"
-                                                                        },
-                                                                        body: "fileName=" + encodeURIComponent(fileName)
-                                                                    })
-                                                                            .then(response => response.text())
-                                                                            .then(result => {
-                                                                                if (result.trim() === "Deleted") {
-                                                                                    alert("✅ Progress deleted successfully.");
-                                                                                    location.reload();
-                                                                                } else {
-                                                                                    alert("❌ Failed to delete progress.");
-                                                                                    console.error(result);
-                                                                                }
-                                                                            })
-                                                                            .catch(error => {
-                                                                                alert("❌ An error occurred while deleting progress.");
-                                                                                console.error("Error:", error);
-                                                                            });
-                                                                });
-                                                            });
-
-                                                            // Handle Edit Comment Button Click
-                                                            document.addEventListener("click", function (e) {
-                                                                if (e.target && e.target.classList.contains("btn-edit-comment")) {
-                                                                    const commentID = e.target.getAttribute("data-comment-id");
-                                                                    const taskID = e.target.getAttribute("data-task-id");
-                                                                    const commentText = e.target.getAttribute("data-comment-text");
-
-                                                                    document.getElementById("editCommentID").value = commentID;
-                                                                    document.getElementById("editTaskID").value = taskID;
-                                                                    document.getElementById("editCommentText").value = commentText;
-
-                                                                    // Hide view comments modal
-                                                                    const viewModal = bootstrap.Modal.getInstance(document.getElementById("viewCommentsModal" + taskID));
-                                                                    if (viewModal)
-                                                                        viewModal.hide();
-
-                                                                    // Show edit comment modal
-                                                                    const editModal = new bootstrap.Modal(document.getElementById("editCommentModal"));
-                                                                    editModal.show();
-                                                                }
-                                                            });
-
-                                                            // Handle Delete Comment Button Click via AJAX
-                                                            document.addEventListener("click", function (e) {
-                                                                if (e.target && e.target.classList.contains("btn-delete-comment")) {
-                                                                    const commentID = e.target.getAttribute("data-comment-id");
-                                                                    const taskID = e.target.getAttribute("data-task-id");
-
-                                                                    if (!confirm("Are you sure you want to delete this comment?"))
-                                                                        return;
-
-                                                                    fetch("TaskCommentsServlet", {
-                                                                        method: "POST",
-                                                                        headers: {
-                                                                            "Content-Type": "application/x-www-form-urlencoded"
-                                                                        },
-                                                                        body: new URLSearchParams({
-                                                                            action: "delete",
-                                                                            commentID: commentID,
-                                                                            taskID: taskID
-                                                                        })
-                                                                    })
-                                                                            .then(res => res.text())
-                                                                            .then(() => {
-                                                                                const container = document.getElementById("commentsContainer" + taskID);
-                                                                                fetch("ViewCommentsServlet?taskID=" + taskID)
-                                                                                        .then(res => res.text())
-                                                                                        .then(html => container.innerHTML = html);
-                                                                            })
-                                                                            .catch(err => {
-                                                                                console.error("Error deleting comment:", err);
-                                                                                alert("❌ Failed to delete comment.");
-                                                                            });
-                                                                }
-                                                            });
-                                                        });
-
-                                                        function submitUploadForm(taskID) {
-                                                            const form = document.getElementById("uploadProgressForm" + taskID);
-                                                            const formData = new FormData(form);
-
-                                                            fetch("UploadProgressServlet", {
-                                                                method: "POST",
-                                                                body: formData
-                                                            })
-                                                                    .then(response => response.text())
-                                                                    .then(result => {
-                                                                        alert("✅ Progress uploaded successfully.");
-                                                                        location.reload();
-                                                                    })
-                                                                    .catch(error => {
-                                                                        console.error("Upload failed:", error);
-                                                                        alert("❌ Upload failed.");
-                                                                    });
-                                                        }
-
-                                                        function submitComment(event, taskID) {
-                                                            event.preventDefault(); // Prevent form from reloading page
-
-                                                            const commentText = document.getElementById("commentText" + taskID).value.trim();
-                                                            if (!commentText) {
-                                                                alert("⚠️ Please write a comment before submitting.");
-                                                                return;
-                                                            }
-
-                                                            fetch("TaskCommentsServlet", {
-                                                                method: "POST",
-                                                                headers: {
-                                                                    "Content-Type": "application/x-www-form-urlencoded"
-                                                                },
-                                                                body: new URLSearchParams({
-                                                                    action: "add",
-                                                                    taskID: taskID,
-                                                                    commentText: commentText
-                                                                })
-                                                            })
-                                                                    .then(res => res.text())
-                                                                    .then(() => {
-                                                                        document.getElementById("commentText" + taskID).value = "";
-                                                                        const modal = bootstrap.Modal.getInstance(document.getElementById("addCommentModal" + taskID));
-                                                                        modal.hide();
-                                                                        const commentsContainer = document.getElementById("commentsContainer" + taskID);
-                                                                        fetch("ViewCommentsServlet?taskID=" + taskID)
-                                                                                .then(res => res.text())
-                                                                                .then(html => commentsContainer.innerHTML = html);
-                                                                    })
-                                                                    .catch(err => {
-                                                                        console.error("Error posting comment:", err);
-                                                                        alert("❌ Failed to post comment.");
-                                                                    });
-                                                        }
-
-// Edit Comment Function
-                                                        function submitEditComment(event) {
-                                                            event.preventDefault();
-
-                                                            const commentID = document.getElementById("editCommentID").value;
-                                                            const taskID = document.getElementById("editTaskID").value;
-                                                            const commentText = document.getElementById("editCommentText").value.trim();
-
-                                                            if (!commentText) {
-                                                                alert("⚠️ Comment cannot be empty.");
-                                                                return;
-                                                            }
-
-                                                            fetch("TaskCommentsServlet", {
-                                                                method: "POST",
-                                                                headers: {
-                                                                    "Content-Type": "application/x-www-form-urlencoded"
-                                                                },
-                                                                body: new URLSearchParams({
-                                                                    action: "edit",
-                                                                    commentID: commentID,
-                                                                    taskID: taskID,
-                                                                    commentText: commentText
-                                                                })
-                                                            })
-                                                                    .then(res => res.text())
-                                                                    .then(() => {
-                                                                        const modal = bootstrap.Modal.getInstance(document.getElementById("editCommentModal"));
-                                                                        modal.hide();
-                                                                        const viewModal = new bootstrap.Modal(document.getElementById("viewCommentsModal" + taskID));
-                                                                        const container = document.getElementById("commentsContainer" + taskID);
-                                                                        fetch("ViewCommentsServlet?taskID=" + taskID)
-                                                                                .then(res => res.text())
-                                                                                .then(html => {
-                                                                                    container.innerHTML = html;
-                                                                                    viewModal.show(); // Show updated view modal
-                                                                                });
-                                                                    })
-                                                                    .catch(err => {
-                                                                        console.error("Error updating comment:", err);
-                                                                        alert("❌ Failed to update comment.");
-                                                                    });
-                                                        }
-                                                    </script>
-
-
-
                                                 </td>
                                             </tr>
                                             <% }
@@ -724,29 +536,299 @@
         </footer>
 
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"></script>
+        <script>
+                                                                const contextPath = "<%= request.getContextPath()%>";
+                                                                console.log("✅ contextPath:", contextPath);
+        </script>
+
 
         <script>
-                                                        function submitEditProgress(progressID) {
-                                                            const form = document.getElementById("editProgressForm" + progressID);
-                                                            const formData = new FormData(form);
+            document.addEventListener("DOMContentLoaded", function () {
+                // Load comments when modal is opened
+                const commentsModals = document.querySelectorAll("[id^='viewCommentsModal']");
+                commentsModals.forEach(modal => {
+                    const taskID = modal.id.replace("viewCommentsModal", "");
+                    modal.addEventListener("show.bs.modal", function () {
+                        const container = document.getElementById("commentsContainer" + taskID);
+                        fetch("ViewCommentsServlet?taskID=" + taskID)
+                                .then(response => response.text())
+                                .then(html => container.innerHTML = html)
+                                .catch(() => container.innerHTML = "<p class='text-danger'>Failed to load comments.</p>");
+                    });
+                });
 
-                                                            fetch("EditProgressServlet", {
-                                                                method: "POST",
-                                                                body: formData
-                                                            })
-                                                                    .then(response => response.text())
-                                                                    .then(() => {
-                                                                        alert("✅ Progress updated successfully.");
-                                                                        const modal = bootstrap.Modal.getInstance(document.getElementById("editProgressModal" + progressID));
-                                                                        if (modal)
-                                                                            modal.hide();
-                                                                        location.reload();
-                                                                    })
-                                                                    .catch(error => {
-                                                                        console.error("Edit failed:", error);
-                                                                        alert("❌ Failed to update progress.");
-                                                                    });
-                                                        }
+                // Handle Delete Progress Button Clicks
+                const removeButtons = document.querySelectorAll(".btn-remove-progress");
+                removeButtons.forEach(button => {
+                    button.addEventListener("click", function () {
+                        const fileName = this.getAttribute("data-file-name");
+
+                        if (!fileName) {
+                            alert("❌ No file name found.");
+                            return;
+                        }
+
+                        if (!confirm("Are you sure you want to delete this progress file?")) {
+                            return;
+                        }
+
+                        fetch("DeleteProgressServlet", {
+                            method: "POST",
+                            headers: {
+                                "Content-Type": "application/x-www-form-urlencoded"
+                            },
+                            body: "fileName=" + encodeURIComponent(fileName)
+                        })
+                                .then(response => response.text())
+                                .then(result => {
+                                    if (result.trim() === "Deleted") {
+                                        alert("✅ Progress deleted successfully.");
+                                        location.reload();
+                                    } else {
+                                        alert("❌ Failed to delete progress.");
+                                        console.error(result);
+                                    }
+                                })
+                                .catch(error => {
+                                    alert("❌ An error occurred while deleting progress.");
+                                    console.error("Error:", error);
+                                });
+                    });
+                });
+
+                // Handle Edit Comment Button Click
+                document.addEventListener("click", function (e) {
+                    if (e.target && e.target.classList.contains("btn-edit-comment")) {
+                        const commentID = e.target.getAttribute("data-comment-id");
+                        const taskID = e.target.getAttribute("data-task-id");
+                        const commentText = e.target.getAttribute("data-comment-text");
+
+                        document.getElementById("editCommentID").value = commentID;
+                        document.getElementById("editTaskID").value = taskID;
+                        document.getElementById("editCommentText").value = commentText;
+
+                        // Hide view comments modal
+                        const viewModal = bootstrap.Modal.getInstance(document.getElementById("viewCommentsModal" + taskID));
+                        if (viewModal)
+                            viewModal.hide();
+
+                        // Show edit comment modal
+                        const editModal = new bootstrap.Modal(document.getElementById("editCommentModal"));
+                        editModal.show();
+                    }
+                });
+
+                // Handle Delete Comment Button Click via AJAX
+                document.addEventListener("click", function (e) {
+                    if (e.target && e.target.classList.contains("btn-delete-comment")) {
+                        const commentID = e.target.getAttribute("data-comment-id");
+                        const taskID = e.target.getAttribute("data-task-id");
+
+                        if (!confirm("Are you sure you want to delete this comment?"))
+                            return;
+
+                        fetch("TaskCommentsServlet", {
+                            method: "POST",
+                            headers: {
+                                "Content-Type": "application/x-www-form-urlencoded"
+                            },
+                            body: new URLSearchParams({
+                                action: "delete",
+                                commentID: commentID,
+                                taskID: taskID
+                            })
+                        })
+                                .then(res => res.text())
+                                .then(() => {
+                                    const container = document.getElementById("commentsContainer" + taskID);
+                                    fetch("ViewCommentsServlet?taskID=" + taskID)
+                                            .then(res => res.text())
+                                            .then(html => container.innerHTML = html);
+                                })
+                                .catch(err => {
+                                    console.error("Error deleting comment:", err);
+                                    alert("❌ Failed to delete comment.");
+                                });
+                    }
+                });
+            });
+
+            function submitUploadForm(taskID) {
+                const form = document.getElementById("uploadProgressForm" + taskID);
+                const formData = new FormData(form);
+                const statusID = form.querySelector("select[name='statusID']").value;
+
+                for (let pair of formData.entries()) {
+                    console.log("📝", pair[0], "=", pair[1]);
+                }
+
+                fetch(contextPath + "/UploadProgressServlet", {
+                    method: "POST",
+                    body: formData
+                })
+                        .then(response => response.text())
+                        .then(result => {
+                            if (statusID) {
+                                return fetch(contextPath + "/UpdateTaskStatusServlet", {
+                                    method: "POST",
+                                    headers: {
+                                        "Content-Type": "application/x-www-form-urlencoded"
+                                    },
+                                    body: `taskID=${taskID}&statusID=${statusID}`
+                                });
+                            }
+                        })
+                        .then(() => {
+                            alert("✅ Progress uploaded and task status updated.");
+                            location.reload();
+                        })
+                        .catch(error => {
+                            console.error("❌ Upload or status update failed:", error);
+                            alert("❌ Upload or status update failed.");
+                        });
+            }
+
+            function submitComment(event, taskID) {
+                event.preventDefault(); // Prevent form from reloading page
+
+                const commentText = document.getElementById("commentText" + taskID).value.trim();
+                if (!commentText) {
+                    alert("⚠️ Please write a comment before submitting.");
+                    return;
+                }
+
+                fetch("TaskCommentsServlet", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/x-www-form-urlencoded"
+                    },
+                    body: new URLSearchParams({
+                        action: "add",
+                        taskID: taskID,
+                        commentText: commentText
+                    })
+                })
+                        .then(res => res.text())
+                        .then(() => {
+                            document.getElementById("commentText" + taskID).value = "";
+                            const modal = bootstrap.Modal.getInstance(document.getElementById("addCommentModal" + taskID));
+                            modal.hide();
+                            const commentsContainer = document.getElementById("commentsContainer" + taskID);
+                            fetch("ViewCommentsServlet?taskID=" + taskID)
+                                    .then(res => res.text())
+                                    .then(html => commentsContainer.innerHTML = html);
+                        })
+                        .catch(err => {
+                            console.error("Error posting comment:", err);
+                            alert("❌ Failed to post comment.");
+                        });
+            }
+
+            // Edit Comment Function
+            function submitEditComment(event) {
+                event.preventDefault();
+
+                const commentID = document.getElementById("editCommentID").value;
+                const taskID = document.getElementById("editTaskID").value;
+                const commentText = document.getElementById("editCommentText").value.trim();
+
+                if (!commentText) {
+                    alert("⚠️ Comment cannot be empty.");
+                    return;
+                }
+
+                fetch("TaskCommentsServlet", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/x-www-form-urlencoded"
+                    },
+                    body: new URLSearchParams({
+                        action: "edit",
+                        commentID: commentID,
+                        taskID: taskID,
+                        commentText: commentText
+                    })
+                })
+                        .then(res => res.text())
+                        .then(() => {
+                            const modal = bootstrap.Modal.getInstance(document.getElementById("editCommentModal"));
+                            modal.hide();
+                            const viewModal = new bootstrap.Modal(document.getElementById("viewCommentsModal" + taskID));
+                            const container = document.getElementById("commentsContainer" + taskID);
+                            fetch("ViewCommentsServlet?taskID=" + taskID)
+                                    .then(res => res.text())
+                                    .then(html => {
+                                        container.innerHTML = html;
+                                        viewModal.show(); // Show updated view modal
+                                    });
+                        })
+                        .catch(err => {
+                            console.error("Error updating comment:", err);
+                            alert("❌ Failed to update comment.");
+                        });
+            }
+
+            function submitEditProgress(progressID) {
+                const form = document.getElementById("editProgressForm" + progressID);
+                if (!form) {
+                    alert("⚠️ Edit form not found for progressID = " + progressID);
+                    return;
+                }
+
+                const taskIDInput = form.querySelector("input[name='taskID']");
+                const statusSelect = form.querySelector("select[name='statusID']");
+
+                if (!taskIDInput || !statusSelect) {
+                    alert("⚠️ Missing input(s) in Edit Progress Modal for progressID = " + progressID);
+                    return;
+                }
+
+                const taskID = taskIDInput.value;
+                const statusID = statusSelect.value;
+
+                if (!taskID || !statusID) {
+                    alert("⚠️ Please ensure both Task ID and Status are selected.");
+                    return;
+                }
+
+                const formData = new FormData(form);
+
+
+                fetch("EditProgressServlet", {
+                    method: "POST",
+                    body: formData
+                })
+                        .then(response => response.text())
+                        .then(result => {
+                            console.log("📨 EditProgressServlet response:", result); // NEW
+                            if (result.includes("unauthorized") || result.includes("error")) {
+                                throw new Error("Server error: " + result);
+                            }
+
+                            return fetch("UpdateTaskStatusServlet", {
+                                method: "POST",
+                                headers: {
+                                    "Content-Type": "application/x-www-form-urlencoded"
+                                },
+                                body: "taskID=" + encodeURIComponent(taskID) + "&statusID=" + encodeURIComponent(statusID)
+                            });
+                        })
+                        .then(response => response.text())
+                        .then(result => {
+                            console.log("📨 UpdateTaskStatusServlet response:", result); // NEW
+                            alert("✅ Progress updated and status changed.");
+                            const modal = bootstrap.Modal.getInstance(document.getElementById("editProgressModal" + progressID));
+                            if (modal)
+                                modal.hide();
+                            location.reload();
+                        })
+
+                        .catch(error => {
+                            console.error("❌ Edit or status update failed:", error.message || error);
+                            alert("❌ Failed to update progress or status.\n\n" + error.message || error);
+                        });
+
+            }
         </script>
 
     </body>

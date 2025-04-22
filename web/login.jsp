@@ -21,7 +21,7 @@
 
         <title>Login Form</title>
     </head>
-    
+
     <body class="d-flex align-items-center justify-content-center vh-100 bg-light">
         <div class="container">
             <div class="row justify-content-center">
@@ -69,6 +69,9 @@
                             <div class="mb-3 form-check">
                                 <input type="checkbox" class="form-check-input" name="remember" id="remember">
                                 <label class="form-check-label" for="remember">Remember Me</label>
+                            </div>
+                            <div class="mb-3 text-end">
+                                <a href="${pageContext.request.contextPath}/forgotPassword.jsp" class="text-decoration-none text-primary">Forgot Password?</a>
                             </div>
 
                             <button type="submit" class="btn btn-primary w-100">Login</button>

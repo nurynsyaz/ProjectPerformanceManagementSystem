@@ -90,11 +90,14 @@
                             </div>
                             <% } %>
 
+                            <% if (roleID != null && roleID == 1) { %>
                             <div class="mb-3 d-flex justify-content-end">
                                 <a href="${pageContext.request.contextPath}/addProject.jsp" class="btn btn-success">
                                     <i class='bx bx-plus'></i> Add Project
                                 </a>
                             </div>
+                            <% } %>
+
 
                             <div class="table-container">
                                 <table class="table table-striped table-bordered">

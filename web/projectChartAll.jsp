@@ -24,20 +24,19 @@
     <canvas id="projectChartAll"></canvas>
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
     const allCenterText = {
         id: 'allCenterText',
         beforeDraw(chart) {
             const { width, height, ctx } = chart;
             ctx.restore();
-            ctx.font = "bold 32px sans-serif";  // You can adjust 32px to 40px or more if you want it bolder
+            ctx.font = "bold 32px sans-serif";
             ctx.textBaseline = 'middle';
             ctx.fillStyle = '#000';
-
             const text = '<%= totalProjects %>';
             const textX = (width - ctx.measureText(text).width) / 2;
             const textY = height / 2;
-
             ctx.fillText(text, textX, textY);
             ctx.save();
         }
@@ -56,9 +55,17 @@
             }]
         },
         options: {
+            responsive: true,
             cutout: '70%',
             plugins: {
-                legend: { display: false }
+                legend: { display: false },
+                tooltip: {
+                    callbacks: {
+                        label: function (context) {
+                            return `${context.label}: ${context.parsed}`;
+                        }
+                    }
+                }
             }
         },
         plugins: [allCenterText]
@@ -81,7 +88,7 @@
     }
 
     .chart-card-wide canvas {
-        width: 250px !important;  /* Fixed canvas size for consistency */
+        width: 250px !important;
         height: 250px !important;
     }
 </style>

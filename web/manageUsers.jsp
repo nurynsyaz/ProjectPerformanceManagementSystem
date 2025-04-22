@@ -50,8 +50,6 @@
                                                     message = "✅ New Client Added Successfully!";
                                                     break;
                                                 case "client_deleted":
-                                                    message = "🗑️ User Deleted Successfully!";
-                                                    break;
                                                 case "deleted":
                                                     message = "🗑️ User Deleted Successfully!";
                                                     break;
@@ -69,11 +67,7 @@
                                         <strong><%= message%></strong>
                                         <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
                                     </div>
-                                    <%
-                                        }
-                                    %>
-
-
+                                    <% } %>
                                 </div>
 
                                 <div class="table-container">
@@ -94,23 +88,48 @@
                                                         <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                                                     </div>
                                                     <div class="modal-body">
+                                                        <% if (request.getAttribute("addClientError") != null) {%>
+                                                        <div class="alert alert-danger text-center">
+                                                            <%= request.getAttribute("addClientError")%>
+                                                        </div>
+                                                        <% } %>
+
                                                         <div class="form-group mb-2">
                                                             <label for="username">Username</label>
                                                             <input type="text" class="form-control" name="username" required>
+                                                            <small class="text-muted">Username must be unique and contain only letters, numbers, or underscores.</small>
                                                         </div>
                                                         <div class="form-group mb-2">
                                                             <label for="email">Email</label>
                                                             <input type="email" class="form-control" name="email" required>
+                                                            <small class="text-muted">Enter a valid email address (e.g., user@example.com).</small>
                                                         </div>
                                                         <div class="form-group mb-2">
                                                             <label for="phoneNumber">Phone Number</label>
                                                             <input type="text" class="form-control" name="phoneNumber" required>
+                                                            <small class="text-muted">Phone number must be exactly 10 digits (e.g., 0123456789).</small>
                                                         </div>
                                                         <div class="form-group mb-2">
                                                             <label for="password">Password</label>
                                                             <input type="password" class="form-control" name="password" required>
+                                                            <small class="text-muted">
+                                                                Password must contain:
+                                                                <ul>
+                                                                    <li>At least 8 characters</li>
+                                                                    <li>One uppercase letter</li>
+                                                                    <li>One lowercase letter</li>
+                                                                    <li>One digit</li>
+                                                                    <li>One special character (@#$%^&+=!)</li>
+                                                                </ul>
+                                                            </small>
                                                         </div>
-                                                        <!-- Hidden: RoleID = 4 (Client) -->
+                                                        <div class="form-group mb-2">
+                                                            <label for="passwordHint">Password Hint</label>
+                                                            <input type="text" class="form-control" name="passwordHint" required>
+                                                            <small class="text-muted">This hint will help clients recover their password if forgotten.</small>
+                                                        </div>
+
+                                                        <!-- Hidden roleID for Client -->
                                                         <input type="hidden" name="roleID" value="4">
                                                     </div>
                                                     <div class="modal-footer">
@@ -121,6 +140,7 @@
                                             </form>
                                         </div>
                                     </div>
+
 
                                     <table class="table table-striped table-bordered">
                                         <thead class="table-dark text-center">
@@ -146,19 +166,18 @@
                                                 <td><%= user.getPhoneNumber()%></td>
                                                 <td><%= user.getRoleID()%></td>
                                                 <td>
-                                                    <a href="DeleteUserServlet?userID=<%= user.getUserID()%>" class="btn btn-sm btn-danger" onclick="return confirm('Are you sure you want to delete this user?');">
+                                                    <a href="DeleteUserServlet?userID=<%= user.getUserID()%>" class="btn btn-sm btn-danger"
+                                                       onclick="return confirm('Are you sure you want to delete this user?');">
                                                         <i class='bx bx-trash'></i> Delete
                                                     </a>
                                                 </td>
                                             </tr>
-                                            <%
-                                                }
-                                            } else {
-                                            %>
+                                            <% }
+                                    } else { %>
                                             <tr>
                                                 <td colspan="6" class="text-center">No users found.</td>
                                             </tr>
-                                            <% }%>
+                                            <% } %>
                                         </tbody>
                                     </table>
                                 </div>
@@ -176,5 +195,14 @@
         </footer>
 
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"></script>
+
+        <!-- Auto-show modal if validation error occurred -->
+        <script>
+            <% if ("true".equals(request.getAttribute("showAddClientModal"))) { %>
+                                                           var addClientModal = new bootstrap.Modal(document.getElementById('addClientModal'));
+                                                           addClientModal.show();
+            <% }%>
+        </script>
+
     </body>
 </html>

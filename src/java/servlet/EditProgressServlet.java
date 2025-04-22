@@ -4,6 +4,7 @@
  */
 package servlet;
 
+import dao.TaskDAO;
 import dao.TaskProgressDAO;
 import model.TaskProgress;
 
@@ -15,9 +16,9 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.*;
 
 @WebServlet("/EditProgressServlet")
-@MultipartConfig(fileSizeThreshold = 1024 * 1024, // 1MB
-        maxFileSize = 10 * 1024 * 1024, // 10MB
-        maxRequestSize = 20 * 1024 * 1024) // 20MB
+@MultipartConfig(fileSizeThreshold = 1024 * 1024,
+        maxFileSize = 10 * 1024 * 1024,
+        maxRequestSize = 20 * 1024 * 1024)
 public class EditProgressServlet extends HttpServlet {
 
     private static final String UPLOAD_DIR = "uploaded_progress";
@@ -26,51 +27,67 @@ public class EditProgressServlet extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
-        int progressID = Integer.parseInt(request.getParameter("progressID"));
-        int taskID = Integer.parseInt(request.getParameter("taskID"));
-        String progressNotes = request.getParameter("progressNotes");
+        try {
+            int progressID = Integer.parseInt(request.getParameter("progressID"));
+            int taskID = Integer.parseInt(request.getParameter("taskID"));
+            String progressNotes = request.getParameter("progressNotes");
+            String statusIDStr = request.getParameter("statusID");
 
-        HttpSession session = request.getSession();
-        Integer userID = (Integer) session.getAttribute("userID");
+            HttpSession session = request.getSession();
+            Integer userID = (Integer) session.getAttribute("userID");
 
-        Part filePart = request.getPart("progressFile");
-        String newFileName = null;
+            Part filePart = request.getPart("progressFile");
+            String newFileName = null;
 
-        if (filePart != null && filePart.getSize() > 0) {
-            String originalFileName = Paths.get(filePart.getSubmittedFileName()).getFileName().toString();
-            newFileName = taskID + "_" + System.currentTimeMillis() + "_" + originalFileName;
+            if (filePart != null && filePart.getSize() > 0) {
+                String originalFileName = Paths.get(filePart.getSubmittedFileName()).getFileName().toString();
+                newFileName = taskID + "_" + System.currentTimeMillis() + "_" + originalFileName;
 
-            String appPath = request.getServletContext().getRealPath("");
-            String uploadPath = appPath + File.separator + UPLOAD_DIR;
-            File uploadDir = new File(uploadPath);
-            if (!uploadDir.exists()) uploadDir.mkdirs();
+                String appPath = request.getServletContext().getRealPath("");
+                String uploadPath = appPath + File.separator + UPLOAD_DIR;
+                File uploadDir = new File(uploadPath);
+                if (!uploadDir.exists()) uploadDir.mkdirs();
 
-            String savedPath = uploadPath + File.separator + newFileName;
-            filePart.write(savedPath);
-        }
+                String savedPath = uploadPath + File.separator + newFileName;
+                filePart.write(savedPath);
+            }
 
-        TaskProgressDAO dao = new TaskProgressDAO();
-        TaskProgress progress = dao.getProgressByID(progressID);
+            TaskProgressDAO dao = new TaskProgressDAO();
+            TaskProgress progress = dao.getProgressByID(progressID);
 
-        // Security: ensure only uploader can edit
-       if (progress == null || progress.getUserID() != userID.intValue()) {
-            response.sendRedirect("viewTasks.jsp?status=unauthorized");
-            return;
-        }
+            // Security check
+            if (progress == null || progress.getUserID() != userID.intValue()) {
+                response.sendRedirect("viewTasks.jsp?status=unauthorized");
+                return;
+            }
 
-        // Update fields
-        if (progressNotes != null) {
-            progress.setNotes(progressNotes);
-        }
-        if (newFileName != null) {
-            progress.setFileName(newFileName);
-        }
+            // Update progress fields
+            if (progressNotes != null) {
+                progress.setNotes(progressNotes);
+            }
+            if (newFileName != null) {
+                progress.setFileName(newFileName);
+            }
 
-        boolean updated = dao.updateProgress(progress);
-        if (updated) {
-            response.sendRedirect("viewTasks.jsp?status=updated");
-        } else {
-            response.sendRedirect("viewTasks.jsp?status=error");
+            boolean updatedProgress = dao.updateProgress(progress);
+
+            // Update task status (if provided)
+            boolean updatedStatus = false;
+            if (statusIDStr != null && !statusIDStr.isEmpty()) {
+                int statusID = Integer.parseInt(statusIDStr);
+                TaskDAO taskDAO = new TaskDAO();
+                updatedStatus = taskDAO.updateTaskStatus(taskID, statusID);
+            }
+
+            if (updatedProgress || updatedStatus) {
+                response.getWriter().write("success");
+            } else {
+                response.getWriter().write("error: update failed");
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace(); // Log to server
+            response.getWriter().write("error: " + e.getMessage()); // Respond to frontend
         }
     }
 }

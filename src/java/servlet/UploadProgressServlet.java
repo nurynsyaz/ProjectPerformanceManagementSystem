@@ -15,9 +15,11 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.*;
 
 @WebServlet("/UploadProgressServlet")
-@MultipartConfig(fileSizeThreshold = 1024 * 1024, // 1MB
-        maxFileSize = 10 * 1024 * 1024, // 10MB
-        maxRequestSize = 20 * 1024 * 1024)   // 20MB
+@MultipartConfig(
+        fileSizeThreshold = 1024 * 1024 * 10,        // 10MB
+        maxFileSize = 1024L * 1024L * 1024L,         // 1GB
+        maxRequestSize = 1024L * 1024L * 1024L * 2   // 2GB (in case of multiple parts)
+)
 public class UploadProgressServlet extends HttpServlet {
 
     private static final String UPLOAD_DIR = "uploaded_progress";
@@ -25,45 +27,63 @@ public class UploadProgressServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        int taskID = Integer.parseInt(request.getParameter("taskID"));
-        int projectID = Integer.parseInt(request.getParameter("projectID"));
-        String progressNotes = request.getParameter("progressNotes");
 
-        HttpSession session = request.getSession();
-        Integer userID = (Integer) session.getAttribute("userID");
+        try {
+            String taskIdStr = request.getParameter("taskID");
+            String projectIdStr = request.getParameter("projectID");
+            String progressNotes = request.getParameter("progressNotes");
 
-        Part filePart = request.getPart("progressFile");
+            if (taskIdStr == null || projectIdStr == null || progressNotes == null) {
+                response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Missing required parameters.");
+                return;
+            }
 
-        if (filePart == null || filePart.getSize() == 0 || userID == null) {
-            response.sendRedirect("viewTasks.jsp?status=error");
-            return;
-        }
+            int taskID = Integer.parseInt(taskIdStr);
+            int projectID = Integer.parseInt(projectIdStr);
 
-        String originalFileName = Paths.get(filePart.getSubmittedFileName()).getFileName().toString();
-        String fileName = taskID + "_" + System.currentTimeMillis() + "_" + originalFileName; // to avoid overwrite
-        String appPath = request.getServletContext().getRealPath("");
-        String uploadPath = appPath + File.separator + UPLOAD_DIR;
+            HttpSession session = request.getSession(false);
+            if (session == null || session.getAttribute("userID") == null) {
+                response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "User not logged in.");
+                return;
+            }
 
-        File uploadDir = new File(uploadPath);
-        if (!uploadDir.exists()) uploadDir.mkdirs();
+            Integer userID = (Integer) session.getAttribute("userID");
+            Part filePart = request.getPart("progressFile");
 
-        String savedPath = uploadPath + File.separator + fileName;
-        filePart.write(savedPath);
+            if (filePart == null || filePart.getSize() == 0) {
+                response.sendError(HttpServletResponse.SC_BAD_REQUEST, "File not uploaded.");
+                return;
+            }
 
-        // Save to DB
-        TaskProgress progress = new TaskProgress();
-        progress.setTaskID(taskID);
-        progress.setUserID(userID);
-        progress.setFileName(fileName);
-        progress.setNotes(progressNotes);
+            String originalFileName = Paths.get(filePart.getSubmittedFileName()).getFileName().toString();
+            String fileName = taskID + "_" + System.currentTimeMillis() + "_" + originalFileName;
+            String appPath = request.getServletContext().getRealPath("");
+            String uploadPath = appPath + File.separator + UPLOAD_DIR;
 
-        TaskProgressDAO progressDAO = new TaskProgressDAO();
-        boolean saved = progressDAO.addProgress(progress);
+            File uploadDir = new File(uploadPath);
+            if (!uploadDir.exists()) uploadDir.mkdirs();
 
-        if (saved) {
-            response.sendRedirect("viewTasks.jsp?status=uploaded");
-        } else {
-            response.sendRedirect("viewTasks.jsp?status=error");
+            String savedPath = uploadPath + File.separator + fileName;
+            filePart.write(savedPath);
+
+            TaskProgress progress = new TaskProgress();
+            progress.setTaskID(taskID);
+            progress.setUserID(userID);
+            progress.setFileName(fileName);
+            progress.setNotes(progressNotes);
+
+            TaskProgressDAO progressDAO = new TaskProgressDAO();
+            boolean saved = progressDAO.addProgress(progress);
+
+            if (saved) {
+                response.getWriter().write("success");
+            } else {
+                response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Database insert failed.");
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Server error: " + e.getMessage());
         }
     }
 }

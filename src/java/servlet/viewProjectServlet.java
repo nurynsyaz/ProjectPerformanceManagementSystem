@@ -8,6 +8,8 @@ import dao.ProjectDAO;
 import dao.UserDAO;
 import model.Project;
 import model.User;
+import dao.ProjectProgressDAO;
+
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
@@ -15,6 +17,8 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.*;
 import java.io.IOException;
 import java.util.*;
+import java.util.Map;
+
 
 @WebServlet("/ViewProjectServlet")
 public class viewProjectServlet extends HttpServlet {
@@ -60,6 +64,17 @@ public class viewProjectServlet extends HttpServlet {
             List<User> eligibleUsers = userDAO.getUsersByRoles(Arrays.asList(2, 3, 4));
             request.setAttribute("eligibleUsers", eligibleUsers);
         }
+
+        // ✅ NEW: Inject progress status data per project for doughnut charts
+        ProjectProgressDAO progressDAO = new ProjectProgressDAO();
+        Map<Integer, Map<String, Integer>> projectProgressMap = new HashMap<>();
+
+        for (Project project : projects) {
+            Map<String, Integer> statusCounts = progressDAO.getTaskStatusCounts(project.getProjectID());
+            projectProgressMap.put(project.getProjectID(), statusCounts);
+        }
+
+        request.setAttribute("projectProgressMap", projectProgressMap);
 
         RequestDispatcher dispatcher = request.getRequestDispatcher("viewProject.jsp");
         dispatcher.forward(request, response);

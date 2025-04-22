@@ -17,6 +17,14 @@
     Integer sessionRoleID = (Integer) session.getAttribute("roleID");
     boolean isAdmin = sessionRoleID != null && (sessionRoleID == 1 || sessionRoleID == 2); // 1 = Head Manager, 2 = Project Manager
 %>
+<%
+    Integer roleID = (Integer) session.getAttribute("roleID");
+    if (roleID == null || roleID != 1) {
+        response.sendRedirect("unauthorized.jsp");
+        return;
+    }
+%>
+
 <!DOCTYPE html>
 <html lang="en">
     <head>

@@ -20,6 +20,13 @@ public class EditTaskServlet extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
+        HttpSession session = request.getSession();
+        Integer roleID = (Integer) session.getAttribute("roleID");
+        if (roleID == null || roleID != 2) {
+            response.sendRedirect("unauthorized.jsp");
+            return;
+        }
+
         int taskID = Integer.parseInt(request.getParameter("taskID"));
         TaskDAO dao = new TaskDAO();
         Task task = dao.getTaskById(taskID);
@@ -35,6 +42,13 @@ public class EditTaskServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+
+        HttpSession session = request.getSession();
+        Integer roleID = (Integer) session.getAttribute("roleID");
+        if (roleID == null || roleID != 2) {
+            response.sendRedirect("unauthorized.jsp");
+            return;
+        }
 
         try {
             int taskID = Integer.parseInt(request.getParameter("taskID"));

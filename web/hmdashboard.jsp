@@ -16,7 +16,7 @@
         <!-- link to css file -->
         <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/style.css">
         <!-- Chart.js (Only once) -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     </head>
     <header>
         <nav class="navbar fixed-top navbar-expand-sm navbar custom-navbar">
@@ -56,23 +56,26 @@
 
 
         <!-- Main Content Area -->
-<main class="main container">
-    <div class="welcome-container text-center mb-4">
-        <h1>Welcome, <%= username %>!</h1>
-        <h2>Role: Head Manager</h2>
-        <p>This is your dashboard. You can manage projects, tasks, and more from here.</p>
-    </div>
+        <main class="main container">
+            <div class="welcome-container text-center mb-4">
+                <h1>Welcome, <%= username %>!</h1>
+                <h2>Role: Head Manager</h2>
+                <p>This is your dashboard. You can manage projects, tasks, and more from here.</p>
+            </div>
 
-    <!-- Two charts side by side -->
-    <div class="row justify-content-center">
-        <div class="col-md-6">
-            <jsp:include page="projectChartAll.jsp" />
-        </div>
-        <div class="col-md-6">
-            <jsp:include page="projectChartUser.jsp" />
-        </div>
-    </div>
-</main>
+            <!-- Two charts side by side -->
+            <div class="row justify-content-center">
+                <div class="col-md-6">
+                    <jsp:include page="projectChartAll.jsp" />
+                </div>
+                <div class="col-md-6">
+                    <jsp:include page="projectChartUser.jsp" />
+                </div>
+                <div class="col-md-6">
+                    <jsp:include page="projectProgressChart.jsp" />
+                </div>
+            </div>
+        </main>
 
 
 

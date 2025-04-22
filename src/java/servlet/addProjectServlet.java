@@ -16,32 +16,24 @@ import db.DBConnection;
 
 @WebServlet("/addProjectServlet")
 public class addProjectServlet extends HttpServlet {
-
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
-        // Retrieve form data
+        HttpSession session = request.getSession();
+        Integer userID = (Integer) session.getAttribute("userID");
+        Integer roleID = (Integer) session.getAttribute("roleID");
+
+        if (userID == null || roleID == null || roleID != 1) {
+            response.sendRedirect("unauthorized.jsp");
+            return;
+        }
+
         String projectName = request.getParameter("projectName");
         String projectDetails = request.getParameter("projectDetails");
         String startDateStr = request.getParameter("projectStartDate");
         String endDateStr = request.getParameter("projectEndDate");
 
-        // ✅ Retrieve userID and roleID from session
-        HttpSession session = request.getSession();
-        Integer userID = (Integer) session.getAttribute("userID");
-        Integer roleID = (Integer) session.getAttribute("roleID");
-
-        System.out.println("userID: " + userID);
-        System.out.println("roleID: " + roleID);
-
-        // If userID or roleID is missing, redirect to login
-        if (userID == null || roleID == null) {
-            response.sendRedirect("login.jsp");
-            return;
-        }
-
-        // Convert string to SQL date
         java.sql.Date startDate = null;
         java.sql.Date endDate = null;
         try {
@@ -54,15 +46,9 @@ public class addProjectServlet extends HttpServlet {
             return;
         }
 
-        // Database connection and insertion
-        Connection conn = null;
-        PreparedStatement ps = null;
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement ps = conn.prepareStatement("INSERT INTO projects (projectName, projectDetails, projectStartDate, projectEndDate, userID, roleID) VALUES (?, ?, ?, ?, ?, ?)");) {
 
-        try {
-            conn = DBConnection.getConnection();
-
-            String sql = "INSERT INTO projects (projectName, projectDetails, projectStartDate, projectEndDate, userID, roleID) VALUES (?, ?, ?, ?, ?, ?)";
-            ps = conn.prepareStatement(sql);
             ps.setString(1, projectName);
             ps.setString(2, projectDetails);
             ps.setDate(3, startDate);
@@ -82,13 +68,6 @@ public class addProjectServlet extends HttpServlet {
             e.printStackTrace();
             request.setAttribute("errorMessage", "Database error: " + e.getMessage());
             request.getRequestDispatcher("projectError.jsp").forward(request, response);
-        } finally {
-            try {
-                if (ps != null) ps.close();
-                if (conn != null) conn.close();
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
         }
     }
 }
