@@ -170,8 +170,10 @@
                                                                                     </tr>
                                                                                 </thead>
                                                                                 <tbody>
-                                                                                    <% for (User user : eligibleUsers) {
-                                                                                            List<User> assignedUsers = taskAssignments.get(task.getTaskID());
+                                                                                    <%
+                                                                                        for (User user : eligibleUsers) {
+                                                                                            if (user.getRoleID() == 3 || user.getRoleID() == 4) { // Optional: confirm role check
+                                                                                                List<User> assignedUsers = taskAssignments.get(task.getTaskID());
                                                                                     %>
                                                                                     <tr class="text-center">
                                                                                         <td>
@@ -184,7 +186,11 @@
                                                                                         <td><%= user.getPhoneNumber()%></td>
                                                                                         <td><%= user.getRoleID() == 3 ? "Team Member" : "Client"%></td>
                                                                                     </tr>
-                                                                                    <% }%>
+                                                                                    <%
+                                                                                            }
+                                                                                        }
+                                                                                    %>
+
                                                                                 </tbody>
 
                                                                             </table>

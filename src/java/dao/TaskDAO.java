@@ -228,4 +228,32 @@ public class TaskDAO {
         }
     }
 
+    public List<User> getEligibleUsersForProject(int projectID) {
+        List<User> users = new ArrayList<>();
+        String sql = "SELECT u.userID, u.username, u.email, u.phoneNumber, u.roleID "
+                + "FROM users u "
+                + "JOIN project_assignment pa ON u.userID = pa.userID "
+                + "WHERE pa.projectID = ? AND u.roleID IN (3, 4)"; // Only Team Members & Clients
+
+        try ( Connection conn = DBConnection.getConnection();  PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setInt(1, projectID);
+            ResultSet rs = stmt.executeQuery();
+
+            while (rs.next()) {
+                User user = new User();
+                user.setUserID(rs.getInt("userID"));
+                user.setUsername(rs.getString("username"));
+                user.setEmail(rs.getString("email"));
+                user.setPhoneNumber(rs.getString("phoneNumber"));
+                user.setRoleID(rs.getInt("roleID"));
+                users.add(user);
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return users;
+    }
+
 }

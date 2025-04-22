@@ -33,9 +33,28 @@
                 <div class="card shadow text-center p-5">
                     <h1 class="text-danger display-4"><i class='bx bx-block'></i> Access Denied</h1>
                     <p class="lead mt-3">You do not have permission to access this page or perform this action.</p>
-                    <a href="dashboard.jsp" class="btn btn-primary mt-4">
-                        <i class='bx bx-home'></i> Return to Dashboard
-                    </a>
+
+                    <%
+                        Integer roleID = (Integer) session.getAttribute("roleID");
+                        String dashboardPage = null;
+
+                        if (roleID != null) {
+                            switch (roleID) {
+                                case 1: dashboardPage = "hmdashboard.jsp"; break;
+                                case 2: dashboardPage = "pmdashboard.jsp"; break;
+                                case 3: dashboardPage = "tmdashboard.jsp"; break;
+                                case 4: dashboardPage = "clientdashboard.jsp"; break;
+                            }
+                        }
+                    %>
+
+                    <% if (dashboardPage != null) { %>
+                        <a href="<%= dashboardPage %>" class="btn btn-primary mt-4">
+                            <i class='bx bx-home'></i> Return to Dashboard
+                        </a>
+                    <% } else { %>
+                        <p class="text-danger mt-3">You are not logged in. Please <a href="login.jsp">log in</a> to continue.</p>
+                    <% } %>
                 </div>
             </div>
         </div>
