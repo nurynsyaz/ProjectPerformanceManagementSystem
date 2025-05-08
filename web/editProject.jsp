@@ -77,13 +77,16 @@
                                     </div>
                                     <div class="mb-3">
                                         <label for="projectStartDate" class="form-label">Start Date</label>
-                                        <input type="date" class="form-control" id="projectStartDate" name="projectStartDate" value="<%= project.getProjectStartDate()%>" required>
+                                        <input type="date" class="form-control" id="projectStartDate" name="projectStartDate"
+                                               value="<%= project.getProjectStartDate()%>" required>
                                     </div>
 
                                     <div class="mb-3">
                                         <label for="projectEndDate" class="form-label">End Date</label>
-                                        <input type="date" class="form-control" id="projectEndDate" name="projectEndDate" value="<%= project.getProjectEndDate()%>" required>
+                                        <input type="date" class="form-control" id="projectEndDate" name="projectEndDate"
+                                               value="<%= project.getProjectEndDate()%>" required>
                                     </div>
+
 
 
                                     <%-- ✅ Optional display of user info for admins --%>
@@ -121,5 +124,15 @@
         </footer>
 
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"></script>
+
+        <!-- Current Date Choose -->
+        <script>
+            document.addEventListener("DOMContentLoaded", function () {
+                const today = new Date().toISOString().split("T")[0];
+                document.getElementById("projectStartDate").setAttribute("min", today);
+                document.getElementById("projectEndDate").setAttribute("min", today);
+            });
+        </script>
+
     </body>
 </html>

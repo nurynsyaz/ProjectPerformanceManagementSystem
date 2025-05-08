@@ -4,10 +4,30 @@
     Author     : nurin
 --%>
 
-<div class="card shadow p-4">
+<div class="chart-card-wide">
     <h5 class="text-center">Your Assigned Projects</h5>
     <canvas id="projectChart" width="400" height="400"></canvas>
 </div>
+<style>
+    .chart-card-wide {
+        background: white;
+        border-radius: 10px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        padding: 20px;
+        margin: 20px auto;
+        max-width: 500px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+    }
+
+    .chart-card-wide canvas {
+        width: 250px !important;
+        height: 250px !important;
+    }
+</style>
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>

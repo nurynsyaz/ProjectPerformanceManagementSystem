@@ -28,6 +28,16 @@ public class EditProjectServlet extends HttpServlet {
         String projectDetails = request.getParameter("projectDetails");
         Date startDate = Date.valueOf(request.getParameter("projectStartDate"));
         Date endDate = Date.valueOf(request.getParameter("projectEndDate"));
+        Date today = new Date(System.currentTimeMillis());
+
+        // ✅ Server-side check to block past dates
+        if (startDate.before(today) || endDate.before(today)) {
+            request.setAttribute("errorMessage", "Start and end dates cannot be before today's date.");
+            Project project = new Project(projectID, projectName, projectDetails, 0, roleID, "", startDate, endDate);
+            request.setAttribute("project", project);
+            request.getRequestDispatcher("editProject.jsp").forward(request, response);
+            return;
+        }
 
         ProjectDAO dao = new ProjectDAO();
         Project existingProject = dao.getProjectById(projectID);

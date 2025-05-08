@@ -41,7 +41,7 @@
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <title>View Projects</title>
         <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
-        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet">
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
         <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/style.css">
     </head>
     <body>
@@ -49,11 +49,11 @@
             <nav class="navbar fixed-top navbar-expand-sm navbar custom-navbar">
                 <div class="container">
                     <a href="#" class="navbar-brand mb-0 h1">
-                        <img class="d-inline-block align-top" src="${pageContext.request.contextPath}/assets/img/PPMSlogo.png" alt="PPMS Logo" width="85" height="80">
+                        <img src="${pageContext.request.contextPath}/assets/img/PPMSlogo.png" width="85" height="80" alt="PPMS Logo" class="d-inline-block align-top">
                     </a>
-                    <button type="button" class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-                        <span class="bx bx-menu"></span>
-                    </button>
+                    <div class="ms-auto">
+                        <jsp:include page="notifications.jsp"/>
+                    </div>
                 </div>
             </nav>
         </header>
@@ -71,24 +71,26 @@
                             </div>
 
                             <% if (status != null) {%>
-                            <div class="alert alert-<%="added".equals(status) || "assigned".equals(status) || "removed".equals(status) ? "success"
+                            <div class="alert alert-<%="added".equals(status) || "assigned".equals(status) || "removed".equals(status) || "updated".equals(status) ? "success"
                                     : "deleted".equals(status) ? "danger"
                                     : "add_failed".equals(status) || "delete_failed".equals(status)
                                     || "assign_failed".equals(status) || "remove_failed".equals(status)
                                     || "invalid_user_role".equals(status) ? "warning" : "info"%> alert-dismissible fade show text-center">
                                 <strong>
-                                    <%="added".equals(status) ? "Project Added Successfully!"
+                                    <%= "added".equals(status) ? "Project Added Successfully!"
+                                            : "updated".equals(status) ? "Project Updated Successfully!"
                                             : "deleted".equals(status) ? "Project Deleted Successfully!"
                                             : "assigned".equals(status) ? "User Assigned Successfully!"
                                             : "assign_failed".equals(status) ? "Failed to Assign User!"
                                             : "removed".equals(status) ? "User Removed from Project Successfully!"
                                             : "remove_failed".equals(status) ? "Failed to Remove User from Project!"
                                             : "invalid_user_role".equals(status) ? "Invalid User Role!"
-                                            : ""%>
+                : ""%>
                                 </strong>
                                 <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
                             </div>
                             <% } %>
+
 
                             <% if (roleID != null && roleID == 1) { %>
                             <div class="mb-3 d-flex justify-content-end">
@@ -264,7 +266,10 @@
             </div>
         </footer>
 
-        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"></script>
+        <!-- jQuery -->
+        <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+        <!-- Bootstrap JS -->
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
         <script>
                                                                                                    const alertBox = document.querySelector(".alert");
                                                                                                    if (alertBox) {

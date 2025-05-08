@@ -36,9 +36,19 @@ public class addProjectServlet extends HttpServlet {
 
         java.sql.Date startDate = null;
         java.sql.Date endDate = null;
+        java.sql.Date today = new java.sql.Date(System.currentTimeMillis());
+
         try {
             startDate = java.sql.Date.valueOf(startDateStr);
             endDate = java.sql.Date.valueOf(endDateStr);
+
+            // ✅ Validate start and end dates are today or in the future
+            if (startDate.before(today) || endDate.before(today)) {
+                request.setAttribute("errorMessage", "Start and end dates cannot be before today's date.");
+                request.getRequestDispatcher("projectError.jsp").forward(request, response);
+                return;
+            }
+
         } catch (IllegalArgumentException e) {
             e.printStackTrace();
             request.setAttribute("errorMessage", "Invalid date format. Please use yyyy-MM-dd.");
@@ -47,7 +57,7 @@ public class addProjectServlet extends HttpServlet {
         }
 
         try (Connection conn = DBConnection.getConnection();
-             PreparedStatement ps = conn.prepareStatement("INSERT INTO projects (projectName, projectDetails, projectStartDate, projectEndDate, userID, roleID) VALUES (?, ?, ?, ?, ?, ?)");) {
+             PreparedStatement ps = conn.prepareStatement("INSERT INTO projects (projectName, projectDetails, projectStartDate, projectEndDate, userID, roleID) VALUES (?, ?, ?, ?, ?, ?)")) {
 
             ps.setString(1, projectName);
             ps.setString(2, projectDetails);

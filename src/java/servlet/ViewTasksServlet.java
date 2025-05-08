@@ -8,17 +8,18 @@ package servlet;
 import dao.ProjectDAO;
 import dao.TaskDAO;
 import dao.UserDAO;
+import dao.TaskProgressDAO;
 import model.Project;
 import model.Task;
 import model.User;
+import model.TaskProgress;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.*;
 import javax.servlet.RequestDispatcher;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 @WebServlet("/ViewTasksServlet")
 public class ViewTasksServlet extends HttpServlet {
@@ -27,6 +28,7 @@ public class ViewTasksServlet extends HttpServlet {
         TaskDAO taskDAO = new TaskDAO();
         ProjectDAO projectDAO = new ProjectDAO();
         UserDAO userDAO = new UserDAO();
+        TaskProgressDAO progressDAO = new TaskProgressDAO();
 
         HttpSession session = request.getSession();
         Integer userID = (Integer) session.getAttribute("userID");
@@ -38,13 +40,11 @@ public class ViewTasksServlet extends HttpServlet {
         }
 
         List<Project> projects;
-
         if (roleID == 1) {
             projects = projectDAO.getProjectsByUser(userID);
         } else {
             projects = projectDAO.getAssignedProjects(userID);
         }
-
         request.setAttribute("projects", projects);
 
         String projectIDParam = request.getParameter("projectID");
@@ -53,28 +53,23 @@ public class ViewTasksServlet extends HttpServlet {
         if (projectIDParam != null && !projectIDParam.isEmpty()) {
             int projectID = Integer.parseInt(projectIDParam);
             boolean hasAccess = false;
-
             for (Project p : projects) {
                 if (p.getProjectID() == projectID) {
                     hasAccess = true;
                     break;
                 }
             }
-
             if (hasAccess) {
                 tasks = taskDAO.getTasksByProjectID(projectID);
             }
-        } else {
-            if (roleID == 1) {
-                tasks = taskDAO.getAllTasksWithStatus();
-            }
+        } else if (roleID == 1) {
+            tasks = taskDAO.getAllTasksWithStatus();
         }
-
         request.setAttribute("tasks", tasks);
 
-// ✅ Filter only Team Members and Clients
+        // ✅ Filter only Team Members and Clients
         List<User> allUsers = userDAO.getAllUsers();
-        List<User> eligibleUsers = new ArrayList<User>();
+        List<User> eligibleUsers = new ArrayList<>();
         for (User user : allUsers) {
             if (user.getRoleID() == 3 || user.getRoleID() == 4) {
                 eligibleUsers.add(user);
@@ -82,13 +77,20 @@ public class ViewTasksServlet extends HttpServlet {
         }
         request.setAttribute("eligibleUsers", eligibleUsers);
 
-// ✅ Add this line to fix missing assignment data
+        // ✅ Assignments for each task
         if (!tasks.isEmpty()) {
             request.setAttribute("taskAssignments", taskDAO.getAssignedUsersForTasks(tasks));
         }
 
+        // ✅ Preload progress entries for each task
+        Map<Integer, List<TaskProgress>> taskProgressMap = new HashMap<>();
+        for (Task task : tasks) {
+            List<TaskProgress> progressList = progressDAO.getProgressByTaskID(task.getTaskID());
+            taskProgressMap.put(task.getTaskID(), progressList);
+        }
+        request.setAttribute("taskProgressMap", taskProgressMap);
+
         RequestDispatcher dispatcher = request.getRequestDispatcher("viewTasks.jsp");
         dispatcher.forward(request, response);
     }
-    
-    }
+}

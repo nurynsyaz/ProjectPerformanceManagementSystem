@@ -6,10 +6,14 @@ package servlet;
 
 import dao.TaskDAO;
 import dao.TaskProgressDAO;
+import dao.NotificationDAO;
+import dao.UserDAO;
 import model.TaskProgress;
+import model.User;
 
 import java.io.*;
 import java.nio.file.*;
+import java.util.List;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.MultipartConfig;
 import javax.servlet.annotation.WebServlet;
@@ -55,13 +59,11 @@ public class EditProgressServlet extends HttpServlet {
             TaskProgressDAO dao = new TaskProgressDAO();
             TaskProgress progress = dao.getProgressByID(progressID);
 
-            // Security check
             if (progress == null || progress.getUserID() != userID.intValue()) {
                 response.sendRedirect("viewTasks.jsp?status=unauthorized");
                 return;
             }
 
-            // Update progress fields
             if (progressNotes != null) {
                 progress.setNotes(progressNotes);
             }
@@ -71,7 +73,6 @@ public class EditProgressServlet extends HttpServlet {
 
             boolean updatedProgress = dao.updateProgress(progress);
 
-            // Update task status (if provided)
             boolean updatedStatus = false;
             if (statusIDStr != null && !statusIDStr.isEmpty()) {
                 int statusID = Integer.parseInt(statusIDStr);
@@ -80,14 +81,24 @@ public class EditProgressServlet extends HttpServlet {
             }
 
             if (updatedProgress || updatedStatus) {
+                // 🔔 Send notification
+                UserDAO userDAO = new UserDAO();
+                NotificationDAO notifDAO = new NotificationDAO();
+                List<User> relatedUsers = userDAO.getUsersRelatedToProject(progress.getProjectID(), userID);
+                String message = "A task progress was updated for Task ID: " + taskID + ".";
+
+                for (User u : relatedUsers) {
+                    notifDAO.addNotification(u.getUserID(), message);
+                }
+
                 response.getWriter().write("success");
             } else {
                 response.getWriter().write("error: update failed");
             }
 
         } catch (Exception e) {
-            e.printStackTrace(); // Log to server
-            response.getWriter().write("error: " + e.getMessage()); // Respond to frontend
+            e.printStackTrace();
+            response.getWriter().write("error: " + e.getMessage());
         }
     }
 }

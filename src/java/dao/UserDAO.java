@@ -4,6 +4,7 @@
  */
 package dao;
 
+import db.DBConnection;
 import model.User;
 import java.sql.*;
 import java.util.List;
@@ -37,13 +38,27 @@ public class UserDAO {
         return user;
     }
 
-    public boolean updateUser(User user) {
-        String sql = "UPDATE users SET username = ?, email = ?, phoneNumber = ? WHERE userID = ?";
+    public boolean updateUser(User user, boolean updatePassword, String passwordHint) {
+        String sql;
+        if (updatePassword) {
+            sql = "UPDATE users SET username = ?, email = ?, phoneNumber = ?, password = ?, password_hint = ? WHERE userID = ?";
+        } else {
+            sql = "UPDATE users SET username = ?, email = ?, phoneNumber = ? WHERE userID = ?";
+        }
+
         try ( Connection conn = getConnection();  PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setString(1, user.getUsername());
             pstmt.setString(2, user.getEmail());
             pstmt.setString(3, user.getPhoneNumber());
-            pstmt.setInt(4, user.getUserID());
+
+            if (updatePassword) {
+                pstmt.setString(4, user.getPassword());
+                pstmt.setString(5, passwordHint);
+                pstmt.setInt(6, user.getUserID());
+            } else {
+                pstmt.setInt(4, user.getUserID());
+            }
+
             return pstmt.executeUpdate() > 0;
         } catch (SQLException e) {
             e.printStackTrace();
@@ -218,77 +233,98 @@ public class UserDAO {
         return user;
     }
 
-    public boolean updatePasswordByPhone(String phoneNumber, String hashedPassword, String salt) {
+    public boolean updatePasswordByPhone(String phone, String hashedPassword, String salt) {
         String sql = "UPDATE users SET password = ?, salt = ? WHERE phoneNumber = ?";
-        try ( Connection conn = getConnection();  PreparedStatement stmt = conn.prepareStatement(sql)) {
+        try ( Connection conn = DBConnection.getConnection();  PreparedStatement stmt = conn.prepareStatement(sql)) {
+
             stmt.setString(1, hashedPassword);
             stmt.setString(2, salt);
-            stmt.setString(3, phoneNumber);
+            stmt.setString(3, phone);
+
             return stmt.executeUpdate() > 0;
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    public User getUserByPhone(String phoneNumber) {
+        User user = null;
+        String sql = "SELECT * FROM users WHERE phoneNumber = ?";
+        try ( Connection conn = getConnection();  PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setString(1, phoneNumber);
+            ResultSet rs = stmt.executeQuery();
+            if (rs.next()) {
+                user = new User(
+                        rs.getInt("userID"),
+                        rs.getString("username"),
+                        rs.getString("email"),
+                        rs.getString("phoneNumber"),
+                        rs.getString("password"),
+                        rs.getString("salt"),
+                        rs.getInt("roleID")
+                );
+            }
         } catch (SQLException e) {
             e.printStackTrace();
         }
-        return false;
+        return user;
     }
-    public User getUserByPhone(String phoneNumber) {
-    User user = null;
-    String sql = "SELECT * FROM users WHERE phoneNumber = ?";
+
+    public User getUserByPhoneAndSecurityAnswer(String phoneNumber, String question, String answer) {
+        User user = null;
+        String sql = "SELECT * FROM users WHERE phoneNumber = ? AND security_question = ? AND security_answer = ?";
+        try ( Connection conn = getConnection();  PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setString(1, phoneNumber);
+            stmt.setString(2, question);
+            stmt.setString(3, answer);
+            ResultSet rs = stmt.executeQuery();
+            if (rs.next()) {
+                user = new User(
+                        rs.getInt("userID"),
+                        rs.getString("username"),
+                        rs.getString("email"),
+                        rs.getString("phoneNumber"),
+                        rs.getString("password"),
+                        rs.getString("salt"),
+                        rs.getInt("roleID")
+                );
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return user;
+    }
+    public List<User> getUsersRelatedToProject(int projectID, int excludeUserID) {
+    List<User> relatedUsers = new ArrayList<>();
+    String sql = "SELECT u.* FROM users u " +
+                 "JOIN project_assignment pa ON u.userID = pa.userID " +
+                 "WHERE pa.projectID = ? AND u.userID != ?";
+
     try (Connection conn = getConnection(); PreparedStatement stmt = conn.prepareStatement(sql)) {
-        stmt.setString(1, phoneNumber);
+        stmt.setInt(1, projectID);
+        stmt.setInt(2, excludeUserID);
+
         ResultSet rs = stmt.executeQuery();
-        if (rs.next()) {
-            user = new User(
-                rs.getInt("userID"),
-                rs.getString("username"),
-                rs.getString("email"),
-                rs.getString("phoneNumber"),
-                rs.getString("password"),
-                rs.getString("salt"),
-                rs.getInt("roleID")
+        while (rs.next()) {
+            User user = new User(
+                    rs.getInt("userID"),
+                    rs.getString("username"),
+                    rs.getString("email"),
+                    rs.getString("phoneNumber"),
+                    rs.getString("password"),
+                    rs.getString("salt"),
+                    rs.getInt("roleID")
             );
+            relatedUsers.add(user);
         }
     } catch (SQLException e) {
         e.printStackTrace();
     }
-    return user;
-}
-    public User getUserByPhoneAndHint(String phoneNumber, String passwordHint) {
-    User user = null;
-    String sql = "SELECT * FROM users WHERE phoneNumber = ? AND password_hint = ?";
 
-    try (Connection conn = getConnection(); PreparedStatement stmt = conn.prepareStatement(sql)) {
-        stmt.setString(1, phoneNumber);
-        stmt.setString(2, passwordHint);
-        ResultSet rs = stmt.executeQuery();
+    return relatedUsers;
+}
 
-        if (rs.next()) {
-            user = new User(
-                rs.getInt("userID"),
-                rs.getString("username"),
-                rs.getString("email"),
-                rs.getString("phoneNumber"),
-                rs.getString("password"),
-                rs.getString("salt"),
-                rs.getInt("roleID")
-            );
-        }
-    } catch (SQLException e) {
-        e.printStackTrace();
-    }
-    return user;
-}
-    public boolean updatePasswordAndHintByPhone(String phoneNumber, String hashedPassword, String salt, String passwordHint) {
-    String sql = "UPDATE users SET password = ?, salt = ?, password_hint = ? WHERE phoneNumber = ?";
-    try (Connection conn = getConnection(); PreparedStatement stmt = conn.prepareStatement(sql)) {
-        stmt.setString(1, hashedPassword);
-        stmt.setString(2, salt);
-        stmt.setString(3, passwordHint);
-        stmt.setString(4, phoneNumber);
-        return stmt.executeUpdate() > 0;
-    } catch (SQLException e) {
-        e.printStackTrace();
-    }
-    return false;
-}
 
 }

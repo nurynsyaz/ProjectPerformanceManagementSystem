@@ -6,6 +6,7 @@ package servlet;
 
 import model.User;
 import dao.UserDAO;
+import pass.PasswordUtils;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -31,39 +32,38 @@ public class UpdateProfileServlet extends HttpServlet {
             return;
         }
 
-        int userId = loggedInUser.getUserID();
         String username = request.getParameter("username");
         String email = request.getParameter("email");
         String phoneNumber = request.getParameter("phoneNumber");
         String password = request.getParameter("password");
+        String passwordHint = request.getParameter("passwordHint");
 
-        // Validate username
         if (!username.matches("^[a-zA-Z0-9_]+$")) {
             request.setAttribute("error", "Invalid username format.");
             request.getRequestDispatcher("profile.jsp").forward(request, response);
             return;
         }
 
-        // Validate phone number
         if (!phoneNumber.matches("\\d{10}")) {
             request.setAttribute("error", "Phone number must be exactly 10 digits.");
             request.getRequestDispatcher("profile.jsp").forward(request, response);
             return;
         }
 
-        // Validate password (if changed)
-        if (!password.isEmpty() && !password.matches("^(?=.*[A-Z])(?=.*[a-z])(?=.*\\d)(?=.*[@#$%^&+=!]).{8,}$")) {
-            request.setAttribute("error", "Password does not meet requirements.");
+        boolean updatePassword = password != null && !password.trim().isEmpty();
+
+        if (updatePassword && !password.matches("^(?=.*[A-Z])(?=.*[a-z])(?=.*\\d)(?=.*[@#$%^&+=!]).{8,}$")) {
+            request.setAttribute("error", "Password does not meet security requirements.");
             request.getRequestDispatcher("profile.jsp").forward(request, response);
             return;
         }
 
-        String newPassword = password.isEmpty()
-                ? loggedInUser.getPassword()
-                : pass.PasswordUtils.hashPassword(password, loggedInUser.getSalt());
+        String newPassword = updatePassword
+                ? PasswordUtils.hashPassword(password, loggedInUser.getSalt())
+                : loggedInUser.getPassword();
 
         User updatedUser = new User(
-                userId,
+                loggedInUser.getUserID(),
                 username,
                 email,
                 phoneNumber,
@@ -72,13 +72,13 @@ public class UpdateProfileServlet extends HttpServlet {
                 loggedInUser.getRoleID()
         );
 
-        boolean updateSuccess = userDAO.updateUser(updatedUser);
+        boolean updateSuccess = userDAO.updateUser(updatedUser, updatePassword, passwordHint);
 
         if (updateSuccess) {
-            session.setAttribute("username", username); // update session username if changed
+            session.setAttribute("username", username);
             response.sendRedirect("profile.jsp?success=true");
         } else {
-            request.setAttribute("error", "Update failed. Try again.");
+            request.setAttribute("error", "Update failed. Please try again.");
             request.getRequestDispatcher("profile.jsp").forward(request, response);
         }
     }

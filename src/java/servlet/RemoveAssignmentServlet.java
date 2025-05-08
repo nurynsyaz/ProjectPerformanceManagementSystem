@@ -4,19 +4,14 @@
  */
 package servlet;
 
+import dao.NotificationDAO;
 import dao.ProjectDAO;
-import java.io.IOException;
+
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
+import javax.servlet.http.*;
+import java.io.IOException;
 
-/**
- *
- * @author nurin
- */
 @WebServlet("/RemoveAssignmentServlet")
 public class RemoveAssignmentServlet extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
@@ -38,6 +33,11 @@ public class RemoveAssignmentServlet extends HttpServlet {
         boolean removed = projectDAO.removeUserFromProject(projectID, userID);
 
         if (removed) {
+            // Send notification to removed user
+            NotificationDAO notificationDAO = new NotificationDAO();
+            String message = "You have been removed from project (ID: " + projectID + ").";
+            notificationDAO.addNotification(userID, message);
+
             response.sendRedirect("ViewProjectServlet?status=removed");
         } else {
             response.sendRedirect("ViewProjectServlet?status=remove_failed");

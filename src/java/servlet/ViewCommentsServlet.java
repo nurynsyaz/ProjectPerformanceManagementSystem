@@ -51,7 +51,7 @@ public class ViewCommentsServlet extends HttpServlet {
                 String commentText = rs.getString("commentText").replace("\"", "&quot;");
                 Timestamp createdAt = rs.getTimestamp("createdAt");
 
-                boolean isOwner = (currentRoleID == 4 && currentUserID == userID);
+                boolean isOwner = (currentUserID == userID);
 
                 out.println("<tr>");
                 out.println("<td>" + username + "</td>");

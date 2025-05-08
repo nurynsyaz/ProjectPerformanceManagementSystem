@@ -5,12 +5,17 @@
 package servlet;
 
 import dao.TaskProgressDAO;
+import dao.NotificationDAO;
+import dao.UserDAO;
+import model.TaskProgress;
+import model.User;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.*;
 import java.io.File;
 import java.io.IOException;
+import java.util.List;
 
 @WebServlet("/DeleteProgressServlet")
 public class DeleteProgressServlet extends HttpServlet {
@@ -23,30 +28,35 @@ public class DeleteProgressServlet extends HttpServlet {
 
         try {
             String fileName = request.getParameter("fileName");
+            int taskID = Integer.parseInt(request.getParameter("taskID"));
+            int projectID = Integer.parseInt(request.getParameter("projectID"));
+            int userID = (Integer) request.getSession().getAttribute("userID");
 
             if (fileName == null || fileName.isEmpty()) {
-                System.err.println("❌ Missing fileName parameter.");
                 response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
                 response.getWriter().write("Missing fileName");
                 return;
             }
 
-            System.out.println("🔍 DeleteProgressServlet called with fileName = " + fileName);
-
             TaskProgressDAO dao = new TaskProgressDAO();
             boolean deletedFromDB = dao.deleteProgressByFileName(fileName);
-            System.out.println("✅ Deleted from DB by fileName: " + deletedFromDB);
 
             if (deletedFromDB) {
                 String appPath = request.getServletContext().getRealPath("");
                 File file = new File(appPath + File.separator + UPLOAD_DIR + File.separator + fileName);
-                System.out.println("📁 File path to delete: " + file.getAbsolutePath());
 
                 if (file.exists()) {
-                    boolean deletedFromDisk = file.delete();
-                    System.out.println("🗑️ File deleted from disk: " + deletedFromDisk);
-                } else {
-                    System.out.println("⚠️ File not found on disk.");
+                    file.delete();
+                }
+
+                // 🔔 Send notification
+                UserDAO userDAO = new UserDAO();
+                NotificationDAO notifDAO = new NotificationDAO();
+                List<User> relatedUsers = userDAO.getUsersRelatedToProject(projectID, userID);
+                String message = "A task progress was deleted for Task ID: " + taskID + ".";
+
+                for (User u : relatedUsers) {
+                    notifDAO.addNotification(u.getUserID(), message);
                 }
 
                 response.setStatus(HttpServletResponse.SC_OK);
@@ -57,9 +67,7 @@ public class DeleteProgressServlet extends HttpServlet {
             }
 
         } catch (Exception e) {
-            System.out.println("🚨 Exception in DeleteProgressServlet:");
             e.printStackTrace();
-
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             response.getWriter().write("Internal error");
         }

@@ -6,6 +6,8 @@ package servlet;
 
 import dao.ProjectDAO;
 import dao.UserDAO;
+import dao.NotificationDAO;
+import model.User;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -36,7 +38,14 @@ public class AddAssignmentServlet extends HttpServlet {
         if (targetRole == 2 || targetRole == 3 || targetRole == 4) {
             ProjectDAO projectDAO = new ProjectDAO();
             boolean assigned = projectDAO.assignUserToProject(projectID, userID, headManagerID);
+
             if (assigned) {
+                // 🔔 Send notification to the assigned user
+                User assignedUser = userDAO.getUserById(userID);
+                String message = "You have been assigned to a new project (ID: " + projectID + ").";
+                NotificationDAO notificationDAO = new NotificationDAO();
+                notificationDAO.addNotification(userID, message);
+
                 response.sendRedirect("ViewProjectServlet?status=assigned");
             } else {
                 response.sendRedirect("ViewProjectServlet?status=assign_failed");

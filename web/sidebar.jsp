@@ -68,6 +68,14 @@
             </a> 
         </li>
         <% } %>
+        <li>
+            <a href="${pageContext.request.contextPath}/ReadNotificationHistoryServlet" class="nav-link">
+                <span class="item-icon">
+                    <i class='bx bx-task'></i>
+                </span>
+                <span class="item-txt">Log Read Notification History</span>
+            </a> 
+        </li>
 
         <li>
             <a href="${pageContext.request.contextPath}/logout.jsp" class="nav-link">

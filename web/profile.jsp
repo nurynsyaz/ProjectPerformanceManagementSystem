@@ -32,18 +32,18 @@
     <head>
         <title>Update Profile</title>
         <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
-        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet">
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
         <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/style.css">
     </head>
     <header>
         <nav class="navbar fixed-top navbar-expand-sm navbar custom-navbar">
             <div class="container">
                 <a href="#" class="navbar-brand mb-0 h1">
-                    <img class="d-inline-block align-top" src="${pageContext.request.contextPath}/assets/img/PPMSlogo.png" alt="PPMS Logo" width="85" height="80">
+                    <img src="${pageContext.request.contextPath}/assets/img/PPMSlogo.png" width="85" height="80" alt="PPMS Logo" class="d-inline-block align-top">
                 </a>
-                <button type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" class="navbar-toggler" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-                    <span class="navbar-toggler-icon"></span>    
-                </button>
+                <div class="ms-auto">
+                    <jsp:include page="notifications.jsp"/>
+                </div>
             </div>
         </nav>
     </header>
@@ -52,7 +52,7 @@
             <jsp:include page="sidebar.jsp"/>
         </div>
         <main class="main d-flex justify-content-center align-items-center">
-    <div class="container">
+            <div class="container">
                 <div class="row justify-content-center">
                     <div class="col-md-6">
                         <div class="card shadow p-4 mt-5">
@@ -82,6 +82,13 @@
                                     <label for="confirmPassword">Confirm New Password</label>
                                     <input type="password" class="form-control" id="confirmPassword" name="confirmPassword" placeholder="Confirm new password">
                                 </div>
+                                <div class="mb-3" id="passwordHintGroup" style="display: none;">
+                                    <label for="passwordHint">Password Hint</label>
+                                    <input type="text" class="form-control" id="passwordHint" name="passwordHint" placeholder="Enter password hint">
+                                    <small class="text-muted">This will help you recover your password if you forget it.</small>
+                                </div>
+
+
 
                                 <button type="submit" class="btn btn-primary w-100">Update Profile</button>
                                 <button type="button" id="cancelButton" class="btn btn-secondary w-100 mt-2">Cancel</button>
@@ -97,9 +104,26 @@
         </footer>
 
         <script>
+            const passwordField = document.getElementById("password");
+            const confirmPasswordField = document.getElementById("confirmPassword");
+            const passwordHintGroup = document.getElementById("passwordHintGroup");
+            const passwordHintField = document.getElementById("passwordHint");
+
+            passwordField.addEventListener("input", function () {
+                if (passwordField.value.trim() !== "") {
+                    passwordHintGroup.style.display = "block";
+                    passwordHintField.required = true;
+                } else {
+                    passwordHintGroup.style.display = "none";
+                    passwordHintField.required = false;
+                    passwordHintField.value = "";
+                }
+            });
+
             document.getElementById("updateProfileForm").addEventListener("submit", function (event) {
-                const password = document.getElementById("password").value;
-                const confirmPassword = document.getElementById("confirmPassword").value;
+                const password = passwordField.value;
+                const confirmPassword = confirmPasswordField.value;
+
                 if (password && password !== confirmPassword) {
                     event.preventDefault();
                     alert("Passwords do not match.");
@@ -108,7 +132,14 @@
 
             document.getElementById("cancelButton").addEventListener("click", function () {
                 document.getElementById("updateProfileForm").reset();
+                passwordHintGroup.style.display = "none";
             });
         </script>
+        <!-- jQuery -->
+        <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+        <!-- Bootstrap JS -->
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+
     </body>
 </html>

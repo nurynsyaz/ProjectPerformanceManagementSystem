@@ -117,7 +117,7 @@ body {
     border-radius: 8px;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
     width: 90%;
-    max-width: 800px; 
+    max-width: 800px;
     text-align: center;
     display: flex;
     justify-content: center;
@@ -185,13 +185,13 @@ body {
 /* Sidebar Navigation */
 .container-sidebar {
     position: fixed;
-    top: 90px; /* Adjust this based on your header height */
+    top: 90px; /* Matches navbar height */
     left: 0;
     width: 250px;
-    height: calc(100vh - 90px); /* Full height minus the header height */
+    height: calc(100vh - 90px); /* Fixed height */
     background-color: #222;
-    overflow-y: auto; /* Allow scrolling if content overflows */
-    z-index: 1000; /* Ensure it stays above other content */
+    overflow-y: hidden; /* ✅ Prevent vertical scrolling */
+    z-index: 1000;
 }
 
 /* Main content area */
@@ -360,6 +360,9 @@ body {
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
+}
+.dropdown-menu {
+    z-index: 9999 !important; /* ✅ ensure it's above header */
 }
 
 

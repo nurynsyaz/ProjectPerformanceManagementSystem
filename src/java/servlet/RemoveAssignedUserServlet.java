@@ -4,6 +4,7 @@
  */
 package servlet;
 
+import dao.NotificationDAO;
 import dao.TaskDAO;
 
 import javax.servlet.ServletException;
@@ -34,6 +35,11 @@ public class RemoveAssignedUserServlet extends HttpServlet {
             boolean removed = taskDAO.removeAssignedTaskUser(taskID, userID);
 
             if (removed) {
+                // Send notification to removed user
+                NotificationDAO notificationDAO = new NotificationDAO();
+                String message = "You have been removed from task (ID: " + taskID + ") under project (ID: " + projectID + ").";
+                notificationDAO.addNotification(userID, message);
+
                 response.sendRedirect("ViewTasksServlet?projectID=" + projectID + "&status=removed");
             } else {
                 response.sendRedirect("ViewTasksServlet?projectID=" + projectID + "&status=remove_failed");

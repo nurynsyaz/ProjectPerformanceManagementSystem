@@ -13,18 +13,23 @@ import javax.servlet.http.*;
 import java.io.IOException;
 import java.sql.*;
 
-@WebServlet("/AddClientServlet")
+@WebServlet("/addclient")
 public class AddClientServlet extends HttpServlet {
 
+    @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        System.out.println("✅ AddClientServlet: doPost triggered");
+
         String username = request.getParameter("username");
         String email = request.getParameter("email");
         String phoneNumber = request.getParameter("phoneNumber");
         String password = request.getParameter("password");
-        String passwordHint = request.getParameter("passwordHint");
-        String role = "4"; // Client role fixed as 4
+        String securityQuestion = request.getParameter("securityQuestion");
+        String securityAnswer = request.getParameter("securityAnswer");
+        String role = "4"; // Fixed role for Client
 
-        // ✅ Validation
+        System.out.println("🔎 Received data: " + username + ", " + email + ", " + phoneNumber);
+
         if (!isValidEmail(email)) {
             returnWithError("❌ Invalid email format.", request, response);
             return;
@@ -45,16 +50,17 @@ public class AddClientServlet extends HttpServlet {
             return;
         }
 
-        // ✅ Hashing
         String salt = PasswordUtils.generateSalt();
         String hashedPassword = PasswordUtils.hashPassword(password, salt);
 
-        boolean success = registerUser(username, email, phoneNumber, hashedPassword, salt, role, passwordHint);
+        boolean success = registerUser(username, email, phoneNumber, hashedPassword, salt, role, securityQuestion, securityAnswer);
 
         if (success) {
+            System.out.println("✅ Client inserted successfully.");
             response.sendRedirect("ManageUsersServlet?status=added");
         } else {
-            returnWithError("❌ Failed to add client.", request, response);
+            System.out.println("❌ Client insertion failed.");
+            returnWithError("❌ Failed to add client. Please check server logs.", request, response);
         }
     }
 
@@ -64,31 +70,39 @@ public class AddClientServlet extends HttpServlet {
             stmt.setString(1, username);
             stmt.setString(2, email);
             ResultSet rs = stmt.executeQuery();
-            return rs.next();
+            boolean exists = rs.next();
+            System.out.println("🔁 User exists? " + exists);
+            return exists;
         } catch (SQLException e) {
             e.printStackTrace();
             return true;
         }
     }
 
-    private boolean registerUser(String username, String email, String phoneNumber, String hashedPassword, String salt, String role, String passwordHint) {
-        String insertQuery = "INSERT INTO users (username, email, phoneNumber, password, salt, roleID, password_hint) VALUES (?, ?, ?, ?, ?, ?, ?)";
+    private boolean registerUser(String username, String email, String phoneNumber, String hashedPassword, String salt, String role, String securityQuestion, String securityAnswer) {
+        String insertQuery = "INSERT INTO users (username, email, phoneNumber, password, salt, roleID, security_question, security_answer) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
         try (Connection conn = DBConnection.getConnection(); PreparedStatement ps = conn.prepareStatement(insertQuery)) {
+            System.out.println("📥 Inserting user: " + username);
+
             ps.setString(1, username);
             ps.setString(2, email);
             ps.setString(3, phoneNumber);
             ps.setString(4, hashedPassword);
             ps.setString(5, salt);
             ps.setInt(6, Integer.parseInt(role));
-            ps.setString(7, passwordHint);
-            return ps.executeUpdate() > 0;
+            ps.setString(7, securityQuestion);
+            ps.setString(8, securityAnswer);
+
+            boolean inserted = ps.executeUpdate() > 0;
+            System.out.println("✅ Insert success? " + inserted);
+            return inserted;
         } catch (SQLException | NumberFormatException e) {
+            System.out.println("⚠️ Insert failed: " + e.getMessage());
             e.printStackTrace();
             return false;
         }
     }
 
-    // === Validation Methods ===
     private boolean isValidEmail(String email) {
         return email != null && email.matches("^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,6}$");
     }

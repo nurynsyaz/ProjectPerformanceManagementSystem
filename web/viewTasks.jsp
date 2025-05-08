@@ -3,17 +3,19 @@
     Created on : 7 Mar 2025, 5:54:09 pm
     Author     : nurin
 --%>
-<%@page import="java.util.Map"%>
+
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <%@page import="java.util.List"%>
+<%@page import="java.util.Map"%>
 <%@page import="model.Task"%>
 <%@page import="model.Project"%>
 <%@page import="model.User"%>
-<%@page import="dao.TaskProgressDAO"%>
 <%@page import="model.TaskProgress"%>
-<%@page import="model.Comment" %>
-<%@page import="dao.CommentDAO" %>
+<%@page import="model.Comment"%>
+<%@page import="dao.TaskProgressDAO"%>
+<%@page import="dao.CommentDAO"%>
 <%@page import="javax.servlet.http.HttpSession"%>
+
 <%
     Integer roleID = (Integer) session.getAttribute("roleID");
     Integer userID = (Integer) session.getAttribute("userID");
@@ -21,25 +23,34 @@
     boolean isTeamMember = roleID != null && roleID == 3;
     boolean isClient = roleID != null && roleID == 4;
 %>
+
 <!DOCTYPE html>
 <html lang="en">
     <head>
         <meta charset="UTF-8">
         <title>View Tasks</title>
-        <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
-        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet">
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+        <link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet">
         <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/style.css">
+        <script>
+            const contextPath = "<%= request.getContextPath()%>";
+        </script>
     </head>
     <body>
+
         <header>
             <nav class="navbar fixed-top navbar-expand-sm navbar custom-navbar">
                 <div class="container">
                     <a href="#" class="navbar-brand mb-0 h1">
-                        <img src="${pageContext.request.contextPath}/assets/img/PPMSlogo.png" alt="PPMS Logo" width="85" height="80">
+                        <img src="${pageContext.request.contextPath}/assets/img/PPMSlogo.png" width="85" height="80" alt="PPMS Logo" class="d-inline-block align-top">
                     </a>
+                    <div class="ms-auto">
+                        <jsp:include page="notifications.jsp"/>
+                    </div>
                 </div>
             </nav>
         </header>
+
         <div class="container-fluid mt-5">
             <div class="row">
                 <div class="container-sidebar">
@@ -52,7 +63,6 @@
                                 <div class="text-center mb-4">
                                     <h2>List of Tasks</h2>
                                 </div>
-
                                 <% String status = request.getParameter("status");
                                     if (status != null) {
                                         String alertClass = "info", message = "";
@@ -120,12 +130,15 @@
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            <% List<Task> tasks = (List<Task>) request.getAttribute("tasks");
+                                            <%
+                                                List<Task> tasks = (List<Task>) request.getAttribute("tasks");
                                                 List<User> eligibleUsers = (List<User>) request.getAttribute("eligibleUsers");
                                                 Map<Integer, List<User>> taskAssignments = (Map<Integer, List<User>>) request.getAttribute("taskAssignments");
+                                                Map<Integer, List<TaskProgress>> taskProgressMap = (Map<Integer, List<TaskProgress>>) request.getAttribute("taskProgressMap");
                                                 if (tasks != null && !tasks.isEmpty()) {
                                                     for (Task task : tasks) {
                                             %>
+
                                             <tr class="text-center">
                                                 <td><%= task.getTaskID()%></td>
                                                 <td><%= task.getProjectName()%></td>
@@ -335,13 +348,12 @@
                                                                 </div>
                                                                 <div class="modal-body">
                                                                     <%
-                                                                        dao.TaskProgressDAO progressDAO = new dao.TaskProgressDAO();
-                                                                        List<model.TaskProgress> progressList = progressDAO.getProgressByTaskID(task.getTaskID());
+                                                                        List<model.TaskProgress> progressList = taskProgressMap.get(task.getTaskID());
                                                                         if (progressList != null && !progressList.isEmpty()) {
                                                                     %>
+
                                                                     <div class="table-responsive">
                                                                         <table class="table table-bordered table-striped text-center">
-
                                                                             <thead class="table-light">
                                                                                 <tr>
                                                                                     <th>File Name</th>
@@ -362,10 +374,7 @@
                                                                                         <%
                                                                                             String encodedFileName = java.net.URLEncoder.encode(p.getFileName(), "UTF-8");
                                                                                         %>
-                                                                                        <a href="DownloadServlet?fileName=<%= encodedFileName%>" class="btn btn-sm btn-success">
-                                                                                            Download
-                                                                                        </a>
-
+                                                                                        <a href="DownloadServlet?fileName=<%= encodedFileName%>" class="btn btn-sm btn-success">Download</a>
                                                                                         <% if (isTeamMember && isUploader) {%>
                                                                                         <button class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#editProgressModal<%= p.getProgressID()%>">
                                                                                             <i class='bx bx-edit'></i> Edit
@@ -373,62 +382,13 @@
                                                                                         <button type="button" class="btn btn-sm btn-danger btn-remove-progress" data-file-name="<%= p.getFileName()%>">
                                                                                             <i class='bx bx-trash'></i> Remove
                                                                                         </button>
-                                                                                        <% }%>
+                                                                                        <% } %>
                                                                                     </td>
                                                                                 </tr>
-
-
-
                                                                                 <% } %>
                                                                             </tbody>
                                                                         </table>
                                                                     </div>
-                                                                    <% for (model.TaskProgress p : progressList) {
-                                                                            if (p.getUserID() == userID) {%>
-                                                                    <!-- Edit Progress Modal -->
-                                                                    <div class="modal fade" id="editProgressModal<%= p.getProgressID()%>" tabindex="-1">
-                                                                        <div class="modal-dialog modal-xl">
-                                                                            <form id="editProgressForm<%= p.getProgressID()%>" enctype="multipart/form-data" onsubmit="return false;">
-                                                                                <input type="hidden" name="progressID" value="<%= p.getProgressID()%>">
-                                                                                <input type="hidden" name="taskID" value="<%= p.getTaskID()%>"> <!-- fixed! -->
-                                                                                <div class="modal-content">
-                                                                                    <div class="modal-header">
-                                                                                        <h5 class="modal-title">Edit Uploaded Progress</h5>
-                                                                                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                                                                                    </div>
-                                                                                    <div class="modal-body">
-                                                                                        <div class="mb-3">
-                                                                                            <label class="form-label">Progress Notes</label>
-                                                                                            <textarea name="progressNotes" class="form-control" rows="4"><%= p.getNotes() != null ? p.getNotes() : ""%></textarea>
-                                                                                        </div>
-                                                                                        <div class="mb-3">
-                                                                                            <label class="form-label">Replace File (optional)</label>
-                                                                                            <input type="file" name="progressFile" class="form-control" accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.zip">
-                                                                                            <small class="text-muted">Leave empty to keep existing file</small>
-                                                                                        </div>
-                                                                                        <div class="mb-3">
-                                                                                            <label class="form-label">Update Task Status</label>
-                                                                                            <select name="statusID" class="form-select" required>
-                                                                                                <option value="">-- Select Status --</option>
-                                                                                                <option value="1">In Progress</option>
-                                                                                                <option value="2">On-Time</option>
-                                                                                                <option value="3">Delayed</option>
-                                                                                                <option value="4">Not Started</option>
-                                                                                            </select>
-                                                                                        </div>
-                                                                                    </div>
-                                                                                    <div class="modal-footer">
-                                                                                        <button type="button" class="btn btn-success" onclick="submitEditProgress(<%= p.getProgressID()%>)">Save Changes</button>
-                                                                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                                                                                    </div>
-                                                                                </div>
-                                                                            </form>
-                                                                        </div>
-                                                                    </div>
-                                                                    <% }
-                                                                        } %>
-
-
                                                                     <% } else { %>
                                                                     <p class="text-muted text-center">No progress files uploaded yet for this task.</p>
                                                                     <% } %>
@@ -436,11 +396,65 @@
                                                             </div>
                                                         </div>
                                                     </div>
+
+                                                    <!-- Edit Progress Modals  -->
+                                                    <%
+                                                        List<model.TaskProgress> editProgressList = taskProgressMap.get(task.getTaskID());
+                                                        if (editProgressList != null) {
+                                                            for (model.TaskProgress p : editProgressList) {
+                                                                if (p.getUserID() == userID) {
+                                                    %>
+
+                                                    <div class="modal fade" id="editProgressModal<%= p.getProgressID()%>" tabindex="-1" aria-hidden="true">
+                                                        <div class="modal-dialog modal-xl">
+                                                            <form id="editProgressForm<%= p.getProgressID()%>" enctype="multipart/form-data" onsubmit="return false;">
+                                                                <input type="hidden" name="progressID" value="<%= p.getProgressID()%>">
+                                                                <input type="hidden" name="taskID" value="<%= p.getTaskID()%>">
+                                                                <div class="modal-content">
+                                                                    <div class="modal-header">
+                                                                        <h5 class="modal-title">Edit Uploaded Progress</h5>
+                                                                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                                                    </div>
+                                                                    <div class="modal-body">
+                                                                        <div class="mb-3">
+                                                                            <label class="form-label">Progress Notes</label>
+                                                                            <textarea name="progressNotes" class="form-control" rows="4"><%= p.getNotes() != null ? p.getNotes() : ""%></textarea>
+                                                                        </div>
+                                                                        <div class="mb-3">
+                                                                            <label class="form-label">Replace File (optional)</label>
+                                                                            <input type="file" name="progressFile" class="form-control" accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.zip">
+                                                                            <small class="text-muted">Leave empty to keep existing file</small>
+                                                                        </div>
+                                                                        <div class="mb-3">
+                                                                            <label class="form-label">Update Task Status</label>
+                                                                            <select name="statusID" class="form-select" required>
+                                                                                <option value="">-- Select Status --</option>
+                                                                                <option value="1">In Progress</option>
+                                                                                <option value="2">On-Time</option>
+                                                                                <option value="3">Delayed</option>
+                                                                                <option value="4">Not Started</option>
+                                                                            </select>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="modal-footer">
+                                                                        <button type="button" class="btn btn-success" onclick="submitEditProgress(<%= p.getProgressID()%>)">Save Changes</button>
+                                                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                                                    </div>
+                                                                </div>
+                                                            </form>
+                                                        </div>
+                                                    </div>
+                                                    <%
+                                                                }
+                                                            }
+                                                        }
+                                                    %>
+
                                                     <% } %>
 
 
 
-                                                    <% if (isClient) {%>
+                                                    <% if (roleID == 1 || isProjectManager || isTeamMember || isClient) {%>
                                                     <!-- 💬 Comment Button -->
                                                     <button class="btn btn-sm btn-warning mt-2" data-bs-toggle="modal" data-bs-target="#addCommentModal<%= task.getTaskID()%>">
                                                         💬 Add Comment
@@ -472,6 +486,7 @@
                                                         </div>
                                                     </div>
                                                     <% }%>
+
 
                                                     <!-- View Comments Button (visible to all) -->
                                                     <button class="btn btn-sm btn-warning mt-1" data-bs-toggle="modal" data-bs-target="#viewCommentsModal<%= task.getTaskID()%>">
@@ -541,11 +556,15 @@
             </div>
         </footer>
 
-        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"></script>
         <script>
-                                                                const contextPath = "<%= request.getContextPath()%>";
-                                                                console.log("✅ contextPath:", contextPath);
+            const contextPath = "<%= request.getContextPath()%>";
+            console.log("✅ contextPath:", contextPath);
         </script>
+        <!-- ✅ jQuery must come first -->
+        <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+        <!-- ✅ Bootstrap 5 JS bundle (includes Popper for modals) -->
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 
 
         <script>
@@ -602,7 +621,7 @@
                     });
                 });
 
-                // Handle Edit Comment Button Click
+                // 🛠️ FIXED: Handle Edit Comment Button Click with modal stacking fix
                 document.addEventListener("click", function (e) {
                     if (e.target && e.target.classList.contains("btn-edit-comment")) {
                         const commentID = e.target.getAttribute("data-comment-id");
@@ -613,14 +632,15 @@
                         document.getElementById("editTaskID").value = taskID;
                         document.getElementById("editCommentText").value = commentText;
 
-                        // Hide view comments modal
                         const viewModal = bootstrap.Modal.getInstance(document.getElementById("viewCommentsModal" + taskID));
                         if (viewModal)
                             viewModal.hide();
 
-                        // Show edit comment modal
-                        const editModal = new bootstrap.Modal(document.getElementById("editCommentModal"));
-                        editModal.show();
+                        // ✅ Delay to avoid stacking bug
+                        setTimeout(() => {
+                            const editModal = new bootstrap.Modal(document.getElementById("editCommentModal"));
+                            editModal.show();
+                        }, 500);
                     }
                 });
 
@@ -695,7 +715,7 @@
             }
 
             function submitComment(event, taskID) {
-                event.preventDefault(); // Prevent form from reloading page
+                event.preventDefault();
 
                 const commentText = document.getElementById("commentText" + taskID).value.trim();
                 if (!commentText) {
@@ -730,7 +750,6 @@
                         });
             }
 
-            // Edit Comment Function
             function submitEditComment(event) {
                 event.preventDefault();
 
@@ -765,7 +784,7 @@
                                     .then(res => res.text())
                                     .then(html => {
                                         container.innerHTML = html;
-                                        viewModal.show(); // Show updated view modal
+                                        viewModal.show();
                                     });
                         })
                         .catch(err => {
@@ -783,22 +802,15 @@
 
                 const taskIDInput = form.querySelector("input[name='taskID']");
                 const statusSelect = form.querySelector("select[name='statusID']");
-
-                if (!taskIDInput || !statusSelect) {
-                    alert("⚠️ Missing input(s) in Edit Progress Modal for progressID = " + progressID);
-                    return;
-                }
-
-                const taskID = taskIDInput.value;
-                const statusID = statusSelect.value;
+                const taskID = taskIDInput ? taskIDInput.value : null;
+                const statusID = statusSelect ? statusSelect.value : null;
 
                 if (!taskID || !statusID) {
-                    alert("⚠️ Please ensure both Task ID and Status are selected.");
+                    alert("⚠️ Please ensure Task ID and Status are selected.");
                     return;
                 }
 
                 const formData = new FormData(form);
-
 
                 fetch("EditProgressServlet", {
                     method: "POST",
@@ -806,11 +818,12 @@
                 })
                         .then(response => response.text())
                         .then(result => {
-                            console.log("📨 EditProgressServlet response:", result); // NEW
+                            console.log("📨 EditProgressServlet response:", result);
                             if (result.includes("unauthorized") || result.includes("error")) {
                                 throw new Error("Server error: " + result);
                             }
 
+                            // Optional: update task status
                             return fetch("UpdateTaskStatusServlet", {
                                 method: "POST",
                                 headers: {
@@ -821,21 +834,26 @@
                         })
                         .then(response => response.text())
                         .then(result => {
-                            console.log("📨 UpdateTaskStatusServlet response:", result); // NEW
-                            alert("✅ Progress updated and status changed.");
-                            const modal = bootstrap.Modal.getInstance(document.getElementById("editProgressModal" + progressID));
-                            if (modal)
-                                modal.hide();
-                            location.reload();
-                        })
+                            console.log("📨 UpdateTaskStatusServlet response:", result);
 
-                        .catch(error => {
-                            console.error("❌ Edit or status update failed:", error.message || error);
-                            alert("❌ Failed to update progress or status.\n\n" + error.message || error);
-                        });
+                            // ✅ Hide modal and redirect back
+                            const editModalEl = document.getElementById("editProgressModal" + progressID);
+                            const editModalInstance = bootstrap.Modal.getInstance(editModalEl);
+                            if (editModalInstance)
+                                editModalInstance.hide();
 
-            }
+                            const projectID = document.querySelector("select[name='projectID']")?.value || "";
+                            const url = `${contextPath}/ViewTasksServlet?status=updated${projectID ? "&projectID=" + projectID : ""}`;
+                                                window.location.href = url;
+                                            })
+                                            .catch(error => {
+                                                console.error("❌ Edit or status update failed:", error.message || error);
+                                                alert("❌ Failed to update progress or status.\n\n" + (error.message || error));
+                                            });
+                                }
+
         </script>
+
 
     </body>
 </html>

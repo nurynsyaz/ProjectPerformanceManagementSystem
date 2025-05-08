@@ -86,6 +86,7 @@
                                     </div>
 
 
+
                                     <div class="d-flex justify-content-between">
                                         <a href="${pageContext.request.contextPath}/ViewProjectServlet" class="btn btn-secondary">
                                             <i class='bx bx-arrow-back'></i> Cancel
@@ -111,5 +112,15 @@
 
         <!-- Bootstrap JS -->
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"></script>
+
+        <!-- Current Date Choose -->
+        <script>
+            document.addEventListener("DOMContentLoaded", function () {
+                const today = new Date().toISOString().split("T")[0];
+                document.getElementById("projectStartDate").setAttribute("min", today);
+                document.getElementById("projectEndDate").setAttribute("min", today);
+            });
+        </script>
+
     </body>
 </html>

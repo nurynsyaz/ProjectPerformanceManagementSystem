@@ -24,7 +24,18 @@ public class RegisterServlet extends HttpServlet {
         String phoneNumber = request.getParameter("phoneNumber");
         String password = request.getParameter("password");
         String role = request.getParameter("role");
-        String passwordHint = request.getParameter("passwordHint");
+        String securityQuestion = request.getParameter("securityQuestion");
+        String securityAnswer = request.getParameter("securityAnswer");
+
+        System.out.println("✅ Reached RegisterServlet");
+
+        System.out.println("Received data:");
+        System.out.println("Username: " + username);
+        System.out.println("Email: " + email);
+        System.out.println("Phone: " + phoneNumber);
+        System.out.println("Role: " + role);
+        System.out.println("Security Question: " + securityQuestion);
+        System.out.println("Security Answer: " + securityAnswer);
 
         // ✅ Input validations
         if (!isValidEmail(email)) {
@@ -56,7 +67,7 @@ public class RegisterServlet extends HttpServlet {
         String hashedPassword = PasswordUtils.hashPassword(password, salt);
 
         // ✅ Register user
-        boolean isRegistered = registerUser(username, email, phoneNumber, hashedPassword, salt, role, passwordHint);
+        boolean isRegistered = registerUser(username, email, phoneNumber, hashedPassword, salt, role, securityQuestion, securityAnswer);
 
         if (isRegistered) {
             response.sendRedirect("login.jsp");
@@ -79,8 +90,8 @@ public class RegisterServlet extends HttpServlet {
         }
     }
 
-    private boolean registerUser(String username, String email, String phoneNumber, String hashedPassword, String salt, String role, String passwordHint) {
-        String insertQuery = "INSERT INTO users (username, email, phoneNumber, password, salt, roleID, password_hint) VALUES (?, ?, ?, ?, ?, ?, ?)";
+    private boolean registerUser(String username, String email, String phoneNumber, String hashedPassword, String salt, String role, String securityQuestion, String securityAnswer) {
+        String insertQuery = "INSERT INTO users (username, email, phoneNumber, password, salt, roleID, security_question, security_answer) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
 
         try (Connection conn = DBConnection.getConnection(); PreparedStatement ps = conn.prepareStatement(insertQuery)) {
             ps.setString(1, username);
@@ -89,10 +100,9 @@ public class RegisterServlet extends HttpServlet {
             ps.setString(4, hashedPassword);
             ps.setString(5, salt);
             ps.setInt(6, Integer.parseInt(role));
-            ps.setString(7, passwordHint);
-
+            ps.setString(7, securityQuestion);
+            ps.setString(8, securityAnswer);
             return ps.executeUpdate() > 0;
-
         } catch (SQLException | NumberFormatException e) {
             e.printStackTrace();
             return false;

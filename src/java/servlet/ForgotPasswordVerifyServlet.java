@@ -18,15 +18,16 @@ public class ForgotPasswordVerifyServlet extends HttpServlet {
             throws ServletException, IOException {
 
         String phone = request.getParameter("phone");
-        String passwordHint = request.getParameter("passwordHint");
+        String question = request.getParameter("securityQuestion");
+        String answer = request.getParameter("securityAnswer");
 
         UserDAO userDAO = new UserDAO();
-        User user = userDAO.getUserByPhoneAndHint(phone, passwordHint);
+        User user = userDAO.getUserByPhoneAndSecurityAnswer(phone, question, answer);
 
         if (user != null) {
             response.sendRedirect("resetPassword.jsp?phone=" + phone);
         } else {
-            request.setAttribute("error", "❌ Phone number or password hint is incorrect.");
+            request.setAttribute("error", "❌ Phone number or security answer is incorrect.");
             request.getRequestDispatcher("forgotPassword.jsp").forward(request, response);
         }
     }

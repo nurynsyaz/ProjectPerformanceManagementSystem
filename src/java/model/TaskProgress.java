@@ -14,17 +14,31 @@ public class TaskProgress {
     private String fileName;
     private String notes;
     private Date uploadedAt;
+    private int projectID; // 🔄 NEW
 
-    public TaskProgress() {
-    }
-
-    public TaskProgress(int progressID, int taskID, int userID, String fileName, String notes, Date uploadedAt) {
+    // Constructor with projectID
+    public TaskProgress(int progressID, int taskID, int userID, String fileName, String notes, Date uploadedAt, int projectID) {
         this.progressID = progressID;
         this.taskID = taskID;
         this.userID = userID;
         this.fileName = fileName;
         this.notes = notes;
         this.uploadedAt = uploadedAt;
+        this.projectID = projectID;
+    }
+    // Overloaded constructor without projectID
+public TaskProgress(int progressID, int taskID, int userID, String fileName, String notes, Date uploadedAt) {
+    this.progressID = progressID;
+    this.taskID = taskID;
+    this.userID = userID;
+    this.fileName = fileName;
+    this.notes = notes;
+    this.uploadedAt = uploadedAt;
+    this.projectID = -1; // Optional default or unused
+}
+    
+
+    public TaskProgress() {
     }
 
     // Getters and Setters
@@ -74,5 +88,13 @@ public class TaskProgress {
 
     public void setUploadedAt(Date uploadedAt) {
         this.uploadedAt = uploadedAt;
+    }
+
+    public int getProjectID() {
+        return projectID;
+    }
+
+    public void setProjectID(int projectID) {
+        this.projectID = projectID;
     }
 }

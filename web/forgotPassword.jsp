@@ -56,21 +56,31 @@
         <div class="forgot-password-card">
             <h4>🔐 Forgot Password</h4>
 
-            <% if (request.getAttribute("error") != null) { %>
+            <% if (request.getAttribute("error") != null) {%>
             <div class="alert alert-danger text-center mt-3">
-                <%= request.getAttribute("error") %>
+                <%= request.getAttribute("error")%>
             </div>
-            <% } %>
+            <% }%>
 
             <form action="ForgotPasswordVerifyServlet" method="post">
                 <div class="mb-3 text-start">
                     <label for="phone" class="form-label">Phone Number</label>
                     <input type="text" class="form-control" name="phone" id="phone" required>
                 </div>
-                <div class="mb-3 text-start">
-                    <label for="passwordHint" class="form-label">Password Hint</label>
-                    <input type="text" class="form-control" name="passwordHint" id="passwordHint" required>
+                <div class="mb-3">
+                    <label for="securityQuestion" class="form-label">Security Question</label>
+                    <select class="form-select" name="securityQuestion" id="securityQuestion" required>
+                        <option value="" disabled selected>Select a question</option>
+                        <option value="What is your mother's maiden name?">What is your mother's maiden name?</option>
+                        <option value="What was your first pet's name?">What was your first pet's name?</option>
+                        <option value="What is your favorite book?">What is your favorite book?</option>
+                    </select>
                 </div>
+                <div class="mb-3">
+                    <label for="securityAnswer" class="form-label">Your Answer</label>
+                    <input type="text" class="form-control" name="securityAnswer" id="securityAnswer" required>
+                </div>
+
                 <button type="submit" class="btn btn-primary w-100">Verify & Continue</button>
             </form>
 

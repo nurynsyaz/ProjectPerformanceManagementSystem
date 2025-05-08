@@ -5,10 +5,14 @@
 package servlet;
 
 import dao.TaskProgressDAO;
+import dao.NotificationDAO;
+import dao.UserDAO;
 import model.TaskProgress;
+import model.User;
 
 import java.io.*;
 import java.nio.file.*;
+import java.util.List;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.MultipartConfig;
 import javax.servlet.annotation.WebServlet;
@@ -16,9 +20,9 @@ import javax.servlet.http.*;
 
 @WebServlet("/UploadProgressServlet")
 @MultipartConfig(
-        fileSizeThreshold = 1024 * 1024 * 10,        // 10MB
-        maxFileSize = 1024L * 1024L * 1024L,         // 1GB
-        maxRequestSize = 1024L * 1024L * 1024L * 2   // 2GB (in case of multiple parts)
+        fileSizeThreshold = 1024 * 1024 * 10,
+        maxFileSize = 1024L * 1024L * 1024L,
+        maxRequestSize = 1024L * 1024L * 1024L * 2
 )
 public class UploadProgressServlet extends HttpServlet {
 
@@ -71,11 +75,23 @@ public class UploadProgressServlet extends HttpServlet {
             progress.setUserID(userID);
             progress.setFileName(fileName);
             progress.setNotes(progressNotes);
+            progress.setProjectID(projectID); // ✅ SET projectID
 
             TaskProgressDAO progressDAO = new TaskProgressDAO();
             boolean saved = progressDAO.addProgress(progress);
 
             if (saved) {
+                // 🔔 Notify users
+                UserDAO userDAO = new UserDAO();
+                NotificationDAO notificationDAO = new NotificationDAO();
+
+                String message = "A new progress was uploaded for Task ID: " + taskID + " in Project ID: " + projectID + ".";
+                List<User> relatedUsers = userDAO.getUsersRelatedToProject(projectID, userID);
+
+                for (User u : relatedUsers) {
+                    notificationDAO.addNotification(u.getUserID(), message);
+                }
+
                 response.getWriter().write("success");
             } else {
                 response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Database insert failed.");

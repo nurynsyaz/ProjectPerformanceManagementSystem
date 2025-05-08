@@ -255,5 +255,19 @@ public class TaskDAO {
 
         return users;
     }
+    public int getProjectIDByTaskID(int taskID) {
+    String sql = "SELECT projectID FROM tasks WHERE taskID = ?";
+    try (Connection conn = DBConnection.getConnection(); PreparedStatement stmt = conn.prepareStatement(sql)) {
+        stmt.setInt(1, taskID);
+        ResultSet rs = stmt.executeQuery();
+        if (rs.next()) {
+            return rs.getInt("projectID");
+        }
+    } catch (SQLException e) {
+        e.printStackTrace();
+    }
+    return -1; // Not found or error
+}
+
 
 }

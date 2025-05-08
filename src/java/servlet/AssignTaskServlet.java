@@ -6,6 +6,8 @@ package servlet;
 
 import dao.TaskDAO;
 import dao.UserDAO;
+import dao.NotificationDAO;
+import model.User;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -40,6 +42,12 @@ public class AssignTaskServlet extends HttpServlet {
                 boolean assigned = taskDAO.assignTaskToUser(taskID, userID);
 
                 if (assigned) {
+                    // 🔔 Notify the assigned Team Member or Client
+                    User assignedUser = userDAO.getUserById(userID);
+                    String message = "You have been assigned to a new task (ID: " + taskID + ") under Project ID: " + projectID + ".";
+                    NotificationDAO notificationDAO = new NotificationDAO();
+                    notificationDAO.addNotification(userID, message);
+
                     response.sendRedirect("ViewTasksServlet?projectID=" + projectID + "&status=assigned");
                 } else {
                     response.sendRedirect("ViewTasksServlet?projectID=" + projectID + "&status=assign_failed");

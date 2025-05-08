@@ -81,7 +81,7 @@
                                     <!-- Add Client Modal -->
                                     <div class="modal fade" id="addClientModal" tabindex="-1" aria-labelledby="addClientModalLabel" aria-hidden="true">
                                         <div class="modal-dialog">
-                                            <form method="post" action="${pageContext.request.contextPath}/AddClientServlet">
+                                            <form method="post" action="addclient">
                                                 <div class="modal-content">
                                                     <div class="modal-header">
                                                         <h5 class="modal-title" id="addClientModalLabel">Add New Client</h5>
@@ -123,11 +123,20 @@
                                                                 </ul>
                                                             </small>
                                                         </div>
-                                                        <div class="form-group mb-2">
-                                                            <label for="passwordHint">Password Hint</label>
-                                                            <input type="text" class="form-control" name="passwordHint" required>
-                                                            <small class="text-muted">This hint will help clients recover their password if forgotten.</small>
+                                                        <div class="mb-3">
+                                                            <label for="securityQuestion" class="form-label">Security Question</label>
+                                                            <select class="form-select" name="securityQuestion" id="securityQuestion" required>
+                                                                <option value="" disabled selected>Select a question</option>
+                                                                <option value="What is your mother's maiden name?">What is your mother's maiden name?</option>
+                                                                <option value="What was your first pet's name?">What was your first pet's name?</option>
+                                                                <option value="What is your favorite book?">What is your favorite book?</option>
+                                                            </select>
                                                         </div>
+                                                        <div class="mb-3">
+                                                            <label for="securityAnswer" class="form-label">Your Answer</label>
+                                                            <input type="text" class="form-control" name="securityAnswer" id="securityAnswer" required>
+                                                        </div>
+
 
                                                         <!-- Hidden roleID for Client -->
                                                         <input type="hidden" name="roleID" value="4">
@@ -173,7 +182,7 @@
                                                 </td>
                                             </tr>
                                             <% }
-                                    } else { %>
+                                            } else { %>
                                             <tr>
                                                 <td colspan="6" class="text-center">No users found.</td>
                                             </tr>
