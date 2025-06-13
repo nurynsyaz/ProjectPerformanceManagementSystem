@@ -14,8 +14,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
     <!-- Bootstrap CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous">
-    <!-- Custom CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/style.css">
 </head>
 <body class="d-flex align-items-center justify-content-center vh-100 bg-light">
@@ -37,25 +36,25 @@
                         <div class="col-md-6">
                             <div class="mb-2">
                                 <label for="username" class="form-label">Username</label>
-                                <input type="text" class="form-control" id="username" name="username" value="${param.username}" placeholder="Enter Username" required>
+                                <input type="text" class="form-control" id="username" name="username" value="${param.username}" placeholder="e.g. nurin_99" required>
                                 <small class="text-muted">Only letters, numbers, underscores. Must be unique.</small>
                             </div>
 
                             <div class="mb-2">
                                 <label for="email" class="form-label">Email</label>
-                                <input type="email" class="form-control" id="email" name="email" value="${param.email}" placeholder="Enter Email" required>
-                                <small class="text-muted">e.g., user@example.com</small>
+                                <input type="email" class="form-control" id="email" name="email" value="${param.email}" placeholder="e.g. user@example.com" required>
+                                <small class="text-muted">Please use a valid email format.</small>
                             </div>
 
                             <div class="mb-2">
                                 <label for="phoneNumber" class="form-label">Phone Number</label>
-                                <input type="tel" class="form-control" id="phoneNumber" name="phoneNumber" value="${param.phoneNumber}" placeholder="e.g., 0123456789" required>
-                                <small class="text-muted">Exactly 10 digits.</small>
+                                <input type="tel" class="form-control" id="phoneNumber" name="phoneNumber" value="${param.phoneNumber}" placeholder="e.g. 0123456789" required>
+                                <small class="text-muted">Exactly 10 digits without dashes or spaces.</small>
                             </div>
 
                             <div class="mb-2">
                                 <label for="password" class="form-label">Password</label>
-                                <input type="password" class="form-control" id="password" name="password" placeholder="Enter Password" required>
+                                <input type="password" class="form-control" id="password" name="password" required>
                                 <small class="text-muted">
                                     <a href="#" data-bs-toggle="collapse" data-bs-target="#pwHelp" style="text-decoration: underline;">Password requirements</a>
                                 </small>
@@ -68,6 +67,12 @@
                                         <li>One special character (@#$%^&+=!)</li>
                                     </ul>
                                 </div>
+
+                                <!-- Progress Bar -->
+                                <div class="progress mt-2" style="height: 8px;">
+                                    <div id="pwStrengthBar" class="progress-bar" role="progressbar" style="width: 0%;"></div>
+                                </div>
+                                <small id="pwStrengthText" class="form-text text-muted mt-1"></small>
                             </div>
                         </div>
 
@@ -85,28 +90,16 @@
 
                             <div class="mb-2">
                                 <label for="securityAnswer" class="form-label">Your Answer</label>
-                                <input type="text" class="form-control" name="securityAnswer" id="securityAnswer" required>
+                                <input type="text" class="form-control" name="securityAnswer" id="securityAnswer" placeholder="e.g. Harry Potter" required>
                             </div>
 
                             <div class="mb-2">
                                 <label class="form-label d-block">Select Role</label>
-                                <div class="form-check">
-                                    <input class="form-check-input" type="radio" id="role1" name="role" value="1" ${param.role == '1' ? 'checked' : ''} required>
-                                    <label class="form-check-label" for="role1">Head Manager</label>
-                                </div>
-                                <div class="form-check">
-                                    <input class="form-check-input" type="radio" id="role2" name="role" value="2" ${param.role == '2' ? 'checked' : ''}>
-                                    <label class="form-check-label" for="role2">Project Manager</label>
-                                </div>
-                                <div class="form-check">
-                                    <input class="form-check-input" type="radio" id="role3" name="role" value="3" ${param.role == '3' ? 'checked' : ''}>
-                                    <label class="form-check-label" for="role3">Team Member</label>
-                                </div>
-                                <div class="form-check">
-                                    <input class="form-check-input" type="radio" id="role4" name="role" value="4" ${param.role == '4' ? 'checked' : ''}>
-                                    <label class="form-check-label" for="role4">Client</label>
-                                </div>
-                                <small class="text-muted">Choose your role in the system.</small>
+                                <div class="form-check"><input class="form-check-input" type="radio" id="role1" name="role" value="1" ${param.role == '1' ? 'checked' : ''} required><label class="form-check-label" for="role1">Head Manager</label></div>
+                                <div class="form-check"><input class="form-check-input" type="radio" id="role2" name="role" value="2" ${param.role == '2' ? 'checked' : ''}><label class="form-check-label" for="role2">Project Manager</label></div>
+                                <div class="form-check"><input class="form-check-input" type="radio" id="role3" name="role" value="3" ${param.role == '3' ? 'checked' : ''}><label class="form-check-label" for="role3">Team Member</label></div>
+                                <div class="form-check"><input class="form-check-input" type="radio" id="role4" name="role" value="4" ${param.role == '4' ? 'checked' : ''}><label class="form-check-label" for="role4">Client</label></div>
+                                <small class="text-muted">Select your role in the system.</small>
                             </div>
                         </div>
                     </div>
@@ -124,8 +117,45 @@
     </div>
 </div>
 
+<!-- Password Strength Logic -->
+<script>
+    const passwordInput = document.getElementById("password");
+    const pwStrengthBar = document.getElementById("pwStrengthBar");
+    const pwStrengthText = document.getElementById("pwStrengthText");
+
+    passwordInput.addEventListener("input", function () {
+        const password = passwordInput.value;
+        let strength = 0;
+
+        if (password.length >= 8) strength++;
+        if (/[A-Z]/.test(password)) strength++;
+        if (/[a-z]/.test(password)) strength++;
+        if (/\d/.test(password)) strength++;
+        if (/[@#$%^&+=!]/.test(password)) strength++;
+
+        if (!password) {
+            pwStrengthBar.style.width = "0%";
+            pwStrengthBar.className = "progress-bar";
+            pwStrengthText.textContent = "";
+        } else if (strength <= 2) {
+            pwStrengthBar.style.width = "33%";
+            pwStrengthBar.className = "progress-bar bg-danger";
+            pwStrengthText.textContent = "Weak password";
+        } else if (strength <= 4) {
+            pwStrengthBar.style.width = "66%";
+            pwStrengthBar.className = "progress-bar bg-warning";
+            pwStrengthText.textContent = "Medium strength password";
+        } else {
+            pwStrengthBar.style.width = "100%";
+            pwStrengthBar.className = "progress-bar bg-success";
+            pwStrengthText.textContent = "Strong password";
+        }
+    });
+</script>
+
 <!-- Bootstrap JS -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"></script>
 <script src="${pageContext.request.contextPath}/assets/js/signupvalidation.js"></script>
 </body>
 </html>
+

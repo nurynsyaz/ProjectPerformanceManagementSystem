@@ -26,7 +26,6 @@ public class UpdateProfileServlet extends HttpServlet {
 
         UserDAO userDAO = new UserDAO();
         User loggedInUser = userDAO.getUserByUsername(usernameInSession);
-
         if (loggedInUser == null) {
             response.sendRedirect("login.jsp");
             return;
@@ -36,7 +35,8 @@ public class UpdateProfileServlet extends HttpServlet {
         String email = request.getParameter("email");
         String phoneNumber = request.getParameter("phoneNumber");
         String password = request.getParameter("password");
-        String passwordHint = request.getParameter("passwordHint");
+        String securityQuestion = request.getParameter("securityQuestion");
+        String securityAnswer = request.getParameter("securityAnswer");
 
         if (!username.matches("^[a-zA-Z0-9_]+$")) {
             request.setAttribute("error", "Invalid username format.");
@@ -62,6 +62,7 @@ public class UpdateProfileServlet extends HttpServlet {
                 ? PasswordUtils.hashPassword(password, loggedInUser.getSalt())
                 : loggedInUser.getPassword();
 
+        // ✅ Use the full constructor with security question and answer
         User updatedUser = new User(
                 loggedInUser.getUserID(),
                 username,
@@ -69,10 +70,13 @@ public class UpdateProfileServlet extends HttpServlet {
                 phoneNumber,
                 newPassword,
                 loggedInUser.getSalt(),
-                loggedInUser.getRoleID()
+                loggedInUser.getRoleID(),
+                securityQuestion,
+                securityAnswer
         );
 
-        boolean updateSuccess = userDAO.updateUser(updatedUser, updatePassword, passwordHint);
+        // ✅ Now this call matches the method signature
+        boolean updateSuccess = userDAO.updateUser(updatedUser, updatePassword, securityQuestion, securityAnswer);
 
         if (updateSuccess) {
             session.setAttribute("username", username);
@@ -83,3 +87,5 @@ public class UpdateProfileServlet extends HttpServlet {
         }
     }
 }
+
+

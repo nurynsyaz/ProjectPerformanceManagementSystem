@@ -13,10 +13,11 @@ public class User {
     private String password;
     private String salt;
     private int roleID;
-    private String passwordHint;
+    private String securityQuestion;
+    private String securityAnswer;
 
-    // Full constructor with password hint
-    public User(int userID, String username, String email, String phoneNumber, String password, String salt, int roleID, String passwordHint) {
+    // Full constructor with security question and answer
+    public User(int userID, String username, String email, String phoneNumber, String password, String salt, int roleID, String securityQuestion, String securityAnswer) {
         this.userID = userID;
         this.username = username;
         this.email = email;
@@ -24,12 +25,13 @@ public class User {
         this.password = password;
         this.salt = salt;
         this.roleID = roleID;
-        this.passwordHint = passwordHint;
+        this.securityQuestion = securityQuestion;
+        this.securityAnswer = securityAnswer;
     }
 
-    // Old constructor without passwordHint for backward compatibility (optional)
+    // Constructor without security question/answer (for legacy use)
     public User(int userID, String username, String email, String phoneNumber, String password, String salt, int roleID) {
-        this(userID, username, email, phoneNumber, password, salt, roleID, null);
+        this(userID, username, email, phoneNumber, password, salt, roleID, null, null);
     }
 
     // Empty constructor
@@ -93,11 +95,19 @@ public class User {
         this.roleID = roleID;
     }
 
-    public String getPasswordHint() {
-        return passwordHint;
+    public String getSecurityQuestion() {
+        return securityQuestion;
     }
 
-    public void setPasswordHint(String passwordHint) {
-        this.passwordHint = passwordHint;
+    public void setSecurityQuestion(String securityQuestion) {
+        this.securityQuestion = securityQuestion;
+    }
+
+    public String getSecurityAnswer() {
+        return securityAnswer;
+    }
+
+    public void setSecurityAnswer(String securityAnswer) {
+        this.securityAnswer = securityAnswer;
     }
 }
