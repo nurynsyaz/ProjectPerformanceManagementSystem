@@ -10,14 +10,14 @@ import java.sql.SQLException;
 
 public class DBConnection {
 
-    private static final String DB_URL = "jdbc:mysql://localhost:3306/ppms";
-    private static final String DB_USERNAME = "root";
-    private static final String DB_PASSWORD = "admin";
+    private static final String JDBC_URL = System.getenv("DB_URL");
+    private static final String JDBC_USERNAME = System.getenv("DB_USER");
+    private static final String JDBC_PASSWORD = System.getenv("DB_PASS");
 
     public static Connection getConnection() throws SQLException {
         try {
             Class.forName("com.mysql.cj.jdbc.Driver");
-            return DriverManager.getConnection(DB_URL, DB_USERNAME, DB_PASSWORD);
+            return DriverManager.getConnection(JDBC_URL, JDBC_USERNAME, JDBC_PASSWORD);
         } catch (ClassNotFoundException e) {
             System.err.println("JDBC Driver not found: " + e.getMessage());
             throw new SQLException("JDBC Driver not found", e);
