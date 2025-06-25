@@ -13,9 +13,9 @@ import model.User;
 
 public class ProjectDAO {
 
-    private static final String URL = "jdbc:mysql://localhost:3306/ppms";
-    private static final String USER = "root";
-    private static final String PASSWORD = "";
+    private static final String JDBC_URL = System.getenv("DB_URL");
+    private static final String JDBC_USERNAME = System.getenv("DB_USER");
+    private static final String JDBC_PASSWORD = System.getenv("DB_PASS");
 
     public List<Project> getAllProjects() {
         List<Project> projects = new ArrayList<>();
@@ -23,7 +23,7 @@ public class ProjectDAO {
                      "p.projectStartDate, p.projectEndDate, u.username " +
                      "FROM projects p JOIN users u ON p.userID = u.userID";
 
-        try (Connection conn = DriverManager.getConnection(URL, USER, PASSWORD);
+        try (Connection conn = DriverManager.getConnection(JDBC_URL, JDBC_USERNAME, JDBC_PASSWORD);
              Statement stmt = conn.createStatement();
              ResultSet rs = stmt.executeQuery(sql)) {
 
@@ -52,7 +52,7 @@ public class ProjectDAO {
                      "p.projectStartDate, p.projectEndDate, u.username " +
                      "FROM projects p JOIN users u ON p.userID = u.userID WHERE p.projectID = ?";
 
-        try (Connection conn = DriverManager.getConnection(URL, USER, PASSWORD);
+        try (Connection conn = DriverManager.getConnection(JDBC_URL, JDBC_USERNAME, JDBC_PASSWORD);
              PreparedStatement stmt = conn.prepareStatement(sql)) {
 
             stmt.setInt(1, projectID);
@@ -82,7 +82,7 @@ public class ProjectDAO {
         String sql = "UPDATE projects SET projectName = ?, projectDetails = ?, " +
                      "projectStartDate = ?, projectEndDate = ? WHERE projectID = ?";
 
-        try (Connection conn = DriverManager.getConnection(URL, USER, PASSWORD);
+        try (Connection conn = DriverManager.getConnection(JDBC_URL, JDBC_USERNAME, JDBC_PASSWORD);
              PreparedStatement stmt = conn.prepareStatement(sql)) {
 
             stmt.setString(1, project.getProjectName());
@@ -101,7 +101,7 @@ public class ProjectDAO {
 
     public boolean deleteProject(int projectID) {
         String sql = "DELETE FROM projects WHERE projectID = ?";
-        try (Connection conn = DriverManager.getConnection(URL, USER, PASSWORD);
+        try (Connection conn = DriverManager.getConnection(JDBC_URL, JDBC_USERNAME, JDBC_PASSWORD);
              PreparedStatement stmt = conn.prepareStatement(sql)) {
 
             stmt.setInt(1, projectID);
@@ -117,7 +117,7 @@ public class ProjectDAO {
         String sql = "INSERT INTO projects (projectName, projectDetails, userID, roleID, projectStartDate, projectEndDate) " +
                      "VALUES (?, ?, ?, ?, ?, ?)";
 
-        try (Connection conn = DriverManager.getConnection(URL, USER, PASSWORD);
+        try (Connection conn = DriverManager.getConnection(JDBC_URL, JDBC_USERNAME, JDBC_PASSWORD);
              PreparedStatement stmt = conn.prepareStatement(sql)) {
 
             stmt.setString(1, project.getProjectName());
@@ -141,7 +141,7 @@ public class ProjectDAO {
                      "p.projectStartDate, p.projectEndDate, u.username " +
                      "FROM projects p JOIN users u ON p.userID = u.userID WHERE p.userID = ?";
 
-        try (Connection conn = DriverManager.getConnection(URL, USER, PASSWORD);
+        try (Connection conn = DriverManager.getConnection(JDBC_URL, JDBC_USERNAME, JDBC_PASSWORD);
              PreparedStatement stmt = conn.prepareStatement(sql)) {
 
             stmt.setInt(1, userID);
@@ -169,7 +169,7 @@ public class ProjectDAO {
 
     public boolean assignUserToProject(int projectID, int userID, int assignedBy) {
         String sql = "INSERT INTO project_assignment (projectID, userID, assignedBy) VALUES (?, ?, ?)";
-        try (Connection conn = DriverManager.getConnection(URL, USER, PASSWORD);
+        try (Connection conn = DriverManager.getConnection(JDBC_URL, JDBC_USERNAME, JDBC_PASSWORD);
              PreparedStatement stmt = conn.prepareStatement(sql)) {
 
             stmt.setInt(1, projectID);
@@ -191,7 +191,7 @@ public class ProjectDAO {
                      "JOIN users u ON pa.userID = u.userID " +
                      "WHERE pa.projectID = ?";
 
-        try (Connection conn = DriverManager.getConnection(URL, USER, PASSWORD);
+        try (Connection conn = DriverManager.getConnection(JDBC_URL, JDBC_USERNAME, JDBC_PASSWORD);
              PreparedStatement stmt = conn.prepareStatement(sql)) {
 
             stmt.setInt(1, projectID);
@@ -223,7 +223,7 @@ public class ProjectDAO {
                      "JOIN users u ON p.userID = u.userID " +
                      "WHERE pa.userID = ?";
 
-        try (Connection conn = DriverManager.getConnection(URL, USER, PASSWORD);
+        try (Connection conn = DriverManager.getConnection(JDBC_URL, JDBC_USERNAME, JDBC_PASSWORD);
              PreparedStatement stmt = conn.prepareStatement(sql)) {
 
             stmt.setInt(1, userID);
